@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Student" ADD COLUMN "avatarId" INTEGER NOT NULL DEFAULT 1;
+
+-- AlterTable
+ALTER TABLE "Teacher" ADD COLUMN "avatarId" INTEGER NOT NULL DEFAULT 1;

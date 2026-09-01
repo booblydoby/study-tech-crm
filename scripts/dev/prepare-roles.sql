@@ -1,0 +1,6 @@
+UPDATE "User"
+SET "roleId" = (SELECT id FROM "Role" WHERE name = 'ADMIN' LIMIT 1)
+WHERE "roleId" IN (SELECT id FROM "Role" WHERE name IN ('SUPER_ADMIN', 'CASHIER'));
+
+DELETE FROM "Role"
+WHERE name IN ('SUPER_ADMIN', 'CASHIER');

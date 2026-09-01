@@ -1,0 +1,9 @@
+# Normalize lne endings across platforms (Windows dev + Linux Docker)
+* text=auto
+
+# Shell scrpts must have LF endings (Docker/entrypoint)
+*.sh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf

@@ -1,0 +1,448 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum StudentStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum GroupStatus {
+  ACTIVE
+  PAUSED
+  CLOSED
+}
+
+enum StudentGroupStatus {
+  ACTIVE
+  LEFT
+}
+
+enum EnrollmentType {
+  GROUP
+  INDIVIDUAL
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  PAUSED
+  FINISHED
+  CANCELLED
+}
+
+enum PaymentPeriod {
+  MONTHLY
+  PER_LESSON
+}
+
+enum LessonType {
+  GROUP
+  INDIVIDUAL
+}
+
+enum LessonStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  MOVED
+}
+
+enum LessonCancellationReason {
+  TEACHER
+  STUDENT
+  WEATHER
+  ILLNESS
+  OTHER
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+}
+
+enum ChargeStatus {
+  UNPAID
+  PARTIAL
+  PAID
+}
+
+enum ExpenseCategory {
+  RENT
+  SALARY
+  UTILITIES
+  SUPPLIES
+  MARKETING
+  EQUIPMENT
+  TAX
+  OTHER
+}
+
+enum NotificationChannel {
+  EMAIL
+  TELEGRAM
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  name      RoleName @unique
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  fullName      String
+  roleId        String
+  role          Role           @relation(fields: [roleId], references: [id])
+  isActive      Boolean        @default(true)
+  lastLoginAt   DateTime?
+  refreshTokens RefreshToken[]
+  studentNotes  StudentNote[]
+  markedRecords Attendance[]   @relation("AttendanceMarker")
+  payments      Payment[]      @relation("PaymentRecorder")
+  charges       Charge[]       @relation("ChargeCreator")
+  notifications Notification[]
+  teacherProfile Teacher?       @relation("TeacherUser")
+  studentProfile Student?       @relation("StudentUser")
+  teacherPayouts TeacherPayout[] @relation("TeacherPayoutRecorder")
+  expenses       Expense[]       @relation("ExpenseRecorder")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Student {
+  id            String         @id @default(cuid())
+  fullName      String
+  phone         String?
+  parentPhone   String?
+  birthDate     DateTime?
+  status        StudentStatus  @default(ACTIVE)
+  source        String?
+  telegram      String?
+  avatarId      Int            @default(1)
+  groups      StudentGroup[]
+  enrollments Enrollment[]
+  notes       StudentNote[]
+  attendance  Attendance[]
+  payments    Payment[]
+  charges     Charge[]
+  individualLessons Lesson[]    @relation("IndividualLessons")
+  userId      String?           @unique
+  user        User?             @relation("StudentUser", fields: [userId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([fullName])
+  @@index([status])
+}
+
+model StudentNote {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Teacher {
+  id             String         @id @default(cuid())
+  fullName       String
+  phone          String?
+  email          String?        @unique
+  specialization String?
+  isActive       Boolean        @default(true)
+  avatarId       Int            @default(1)
+  groups         GroupTeacher[]
+  enrollments    Enrollment[]
+  lessons        Lesson[]
+  payouts        TeacherPayout[]
+  userId         String?        @unique
+  user           User?          @relation("TeacherUser", fields: [userId], references: [id])
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  groups      Group[]
+  enrollments Enrollment[]
+  lessons     Lesson[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Group {
+  id              String         @id @default(cuid())
+  name            String
+  subjectId       String
+  subject         Subject        @relation(fields: [subjectId], references: [id])
+  monthlyPrice    Int
+  schedulePattern Json?          // { daysOfWeek: number[], time: string, duration: number }
+  status          GroupStatus    @default(ACTIVE)
+  startDate       DateTime?
+  students        StudentGroup[]
+  enrollments     Enrollment[]
+  teachers        GroupTeacher[]
+  lessons         Lesson[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([subjectId])
+  @@index([status])
+}
+
+model StudentGroup {
+  id        String             @id @default(cuid())
+  studentId String
+  student   Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  groupId   String
+  group     Group              @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime           @default(now())
+  leftAt    DateTime?
+  status    StudentGroupStatus @default(ACTIVE)
+  price     Int?               // Individual price override (null = use group.monthlyPrice)
+
+  @@unique([studentId, groupId])
+}
+
+model Enrollment {
+  id                 String           @id @default(cuid())
+  studentId          String
+  student            Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId          String
+  subject            Subject          @relation(fields: [subjectId], references: [id])
+  teacherId          String
+  teacher            Teacher          @relation(fields: [teacherId], references: [id])
+  groupId            String?
+  group              Group?           @relation(fields: [groupId], references: [id])
+  type               EnrollmentType
+  status             EnrollmentStatus @default(ACTIVE)
+  price              Int
+  billable           Boolean          @default(true) // Учитывать ли запись в выручке/оплатах (false = входит в фикс-пакет)
+  paymentPeriod      PaymentPeriod    @default(MONTHLY)
+  teacherCommission  Int              @default(0) // Teacher's commission percentage (0-100)
+  startDate          DateTime         @default(now())
+  endDate            DateTime?
+  frozenAt           DateTime?
+  frozenUntil        DateTime?
+  freezeReason       String?
+  breakStart         DateTime?        // Запланированный перерыв: начало (null = нет перерыва)
+  breakEnd           DateTime?        // Дата возвращения (null = бессрочно, снимается вручную)
+  breakReason        String?
+  schedulePattern    Json?            // { daysOfWeek: number[], time: string, duration: number }
+  totalLessons       Int?             // Total lessons in cycle
+  completedLessons   Int              @default(0)
+  lessonDebt         Int              @default(0) // Number of lessons owed due to teacher cancellation
+  payments           Payment[]
+  charges            Charge[]
+  lessons            Lesson[]
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@index([studentId])
+  @@index([teacherId])
+  @@index([subjectId])
+  @@index([groupId])
+  @@index([status])
+}
+
+model GroupTeacher {
+  id         String   @id @default(cuid())
+  groupId    String
+  group      Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  teacherId  String
+  teacher    Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+
+  @@unique([groupId, teacherId])
+}
+
+model Lesson {
+  id                     String                   @id @default(cuid())
+  type                   LessonType               @default(GROUP)
+  enrollmentId           String?
+  enrollment             Enrollment?              @relation(fields: [enrollmentId], references: [id])
+  groupId                String?
+  group                  Group?                   @relation(fields: [groupId], references: [id])
+  studentId              String?
+  student                Student?                 @relation("IndividualLessons", fields: [studentId], references: [id])
+  teacherId              String
+  teacher                Teacher                  @relation(fields: [teacherId], references: [id])
+  subjectId              String
+  subject                Subject                  @relation(fields: [subjectId], references: [id])
+  startsAt               DateTime
+  endsAt                 DateTime
+  status                 LessonStatus             @default(SCHEDULED)
+  cancellationReason     String?
+  cancellationType       LessonCancellationReason?
+  isReplacementLesson    Boolean                  @default(false) // Whether this lesson is a replacement for a cancelled one
+  originalLessonId       String?                  // Reference to original lesson if this is a replacement
+  attendance             Attendance[]
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+
+  @@index([startsAt])
+  @@index([groupId])
+  @@index([studentId])
+  @@index([teacherId])
+  @@index([enrollmentId])
+}
+
+model Attendance {
+  id         String           @id @default(cuid())
+  lessonId   String
+  lesson     Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status     AttendanceStatus
+  comment    String?
+  markedById String
+  markedBy   User             @relation("AttendanceMarker", fields: [markedById], references: [id])
+  createdAt  DateTime         @default(now())
+
+  @@unique([lessonId, studentId])
+  @@index([studentId])
+}
+
+// Начисление за цикл: сколько ученик должен заплатить за период.
+model Charge {
+  id              String        @id @default(cuid())
+  studentId       String
+  student         Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  enrollmentId    String?
+  enrollment      Enrollment?   @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+  dueAmount       Int           // Сколько нужно заплатить за цикл (вводится вручную)
+  periodFrom      DateTime
+  periodTo        DateTime
+  lessonsInCycle  Int?
+  nextPaymentDue  DateTime?
+  status          ChargeStatus  @default(UNPAID)
+  comment         String?
+  createdById     String
+  createdBy       User          @relation("ChargeCreator", fields: [createdById], references: [id])
+  payments        Payment[]
+  createdAt       DateTime      @default(now())
+
+  @@index([studentId])
+  @@index([enrollmentId])
+  @@index([status])
+}
+
+// Взнос: конкретная внесённая сумма по начислению.
+model Payment {
+  id              String        @id @default(cuid())
+  studentId       String
+  student         Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  enrollmentId    String?
+  enrollment      Enrollment?   @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+  chargeId        String?
+  charge          Charge?       @relation(fields: [chargeId], references: [id], onDelete: Cascade)
+  amount          Int
+  method          PaymentMethod
+  paidAt          DateTime
+  periodFrom      DateTime
+  periodTo        DateTime
+  lessonsInCycle  Int?
+  nextPaymentDue  DateTime?
+  comment         String?
+  recordedById    String
+  recordedBy      User          @relation("PaymentRecorder", fields: [recordedById], references: [id])
+  createdAt       DateTime      @default(now())
+
+  @@index([studentId])
+  @@index([enrollmentId])
+  @@index([chargeId])
+  @@index([paidAt])
+  @@index([nextPaymentDue])
+}
+
+// Выплата преподавателю его доли от оплат учеников.
+model TeacherPayout {
+  id           String   @id @default(cuid())
+  teacherId    String
+  teacher      Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  amount       Int
+  paidAt       DateTime
+  comment      String?
+  recordedById String
+  recordedBy   User     @relation("TeacherPayoutRecorder", fields: [recordedById], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@index([teacherId])
+  @@index([paidAt])
+}
+
+// Операционные расходы центра (аренда, материалы и т.д.).
+model Expense {
+  id           String          @id @default(cuid())
+  title        String
+  category     ExpenseCategory @default(OTHER)
+  amount       Int
+  spentAt      DateTime
+  comment      String?
+  recordedById String
+  recordedBy   User            @relation("ExpenseRecorder", fields: [recordedById], references: [id])
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([spentAt])
+  @@index([category])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   NotificationChannel
+  title     String
+  message   String
+  status    NotificationStatus  @default(PENDING)
+  sentAt    DateTime?
+  createdAt DateTime            @default(now())
+}
