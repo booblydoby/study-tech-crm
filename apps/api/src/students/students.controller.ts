@@ -65,7 +65,11 @@ export class StudentsController {
 
   @Post(":id/notes")
   @Roles(RoleName.ADMIN, RoleName.TEACHER)
-  addNote(@Param("id") id: string, @CurrentUser() user: { sub: string; role: string; teacherId?: string }, @Body() dto: CreateStudentNoteDto) {
+  addNote(
+    @Param("id") id: string,
+    @CurrentUser() user: { sub: string; role: string; teacherId?: string },
+    @Body() dto: CreateStudentNoteDto
+  ) {
     return this.students.addNote(id, user.sub, dto, user);
   }
 }

@@ -21,7 +21,14 @@ import {
   type LessonOccurrence
 } from "../common/utils/lesson-schedule";
 import { PrismaService } from "../prisma/prisma.service";
-import { CancelLessonDto, CancelLessonWithOptionsDto, CreateLessonDto, RescheduleLessonDto, UpdateLessonDto, LessonCancellationReason } from "./lessons.dto";
+import {
+  CancelLessonDto,
+  CancelLessonWithOptionsDto,
+  CreateLessonDto,
+  RescheduleLessonDto,
+  UpdateLessonDto,
+  LessonCancellationReason
+} from "./lessons.dto";
 
 @Injectable()
 export class LessonsService {
@@ -141,14 +148,20 @@ export class LessonsService {
         );
       }
 
-      return getLessonOccurrences(pattern, charge.periodFrom, 200)
-        .filter((occ) => occ.startsAt <= charge.periodTo && !isEnrollmentOnBreak(enrollment, occ.startsAt));
+      return getLessonOccurrences(pattern, charge.periodFrom, 200).filter(
+        (occ) => occ.startsAt <= charge.periodTo && !isEnrollmentOnBreak(enrollment, occ.startsAt)
+      );
     } catch {
       return [];
     }
   }
 
-  private async lessonExistsAt(groupId: string | null, studentId: string | null, enrollmentId: string | null, startsAt: Date) {
+  private async lessonExistsAt(
+    groupId: string | null,
+    studentId: string | null,
+    enrollmentId: string | null,
+    startsAt: Date
+  ) {
     const window = {
       gte: new Date(startsAt.getTime() - 60_000),
       lte: new Date(startsAt.getTime() + 60_000)
@@ -264,9 +277,9 @@ export class LessonsService {
     }
   }
 
-  private dedupeStudentLessons<T extends { id: string; startsAt: Date; subjectId: string; status: string; type: string }>(
-    lessons: T[]
-  ): T[] {
+  private dedupeStudentLessons<
+    T extends { id: string; startsAt: Date; subjectId: string; status: string; type: string }
+  >(lessons: T[]): T[] {
     const bySlot = new Map<string, T>();
     for (const lesson of lessons) {
       const slotKey = `${Math.floor(lesson.startsAt.getTime() / 60_000)}_${lesson.subjectId}`;
@@ -285,13 +298,15 @@ export class LessonsService {
     return [...bySlot.values()].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
   }
 
-  private async filterLessonsForStudentView<T extends {
-    startsAt: Date;
-    groupId: string | null;
-    enrollmentId: string | null;
-    studentId: string | null;
-    type: string;
-  }>(studentId: string, lessons: T[]): Promise<T[]> {
+  private async filterLessonsForStudentView<
+    T extends {
+      startsAt: Date;
+      groupId: string | null;
+      enrollmentId: string | null;
+      studentId: string | null;
+      type: string;
+    }
+  >(studentId: string, lessons: T[]): Promise<T[]> {
     const [enrollments, memberships] = await Promise.all([
       this.prisma.enrollment.findMany({
         where: { studentId },
@@ -390,8 +405,10 @@ export class LessonsService {
     this.assertTeacherCanUseTeacherId(user, dto.teacherId);
     if (new Date(dto.endsAt) <= new Date(dto.startsAt)) throw new BadRequestException("Lesson end must be after start");
     const type = dto.type ?? (dto.studentId ? LessonType.INDIVIDUAL : LessonType.GROUP);
-    if (type === LessonType.GROUP && !dto.groupId) throw new BadRequestException("groupId is required for group lesson");
-    if (type === LessonType.INDIVIDUAL && !dto.studentId) throw new BadRequestException("studentId is required for individual lesson");
+    if (type === LessonType.GROUP && !dto.groupId)
+      throw new BadRequestException("groupId is required for group lesson");
+    if (type === LessonType.INDIVIDUAL && !dto.studentId)
+      throw new BadRequestException("studentId is required for individual lesson");
     return this.prisma.lesson.create({
       data: {
         type,
@@ -426,7 +443,7 @@ export class LessonsService {
   }
   async cancel(user: AuthUser, id: string, dto: CancelLessonDto) {
     const lesson = await this.findOne(user, id);
-    
+
     // Update lesson status
     const updatedLesson = await this.prisma.lesson.update({
       where: { id },
@@ -475,11 +492,7 @@ export class LessonsService {
         data: { lessonDebt: { increment: 1 } }
       });
     } else if (dto.action === "reschedule" && dto.newStartsAt && dto.newEndsAt) {
-      replacement = await this.createReplacementLesson(
-        lesson,
-        new Date(dto.newStartsAt),
-        new Date(dto.newEndsAt)
-      );
+      replacement = await this.createReplacementLesson(lesson, new Date(dto.newStartsAt), new Date(dto.newEndsAt));
     } else if (dto.action === "adjust_payment" && lesson.enrollmentId) {
       await this.prisma.enrollment.update({
         where: { id: lesson.enrollmentId },
@@ -506,11 +519,7 @@ export class LessonsService {
       throw new BadRequestException("Перенос можно создать только для отменённого занятия");
     }
 
-    const replacement = await this.createReplacementLesson(
-      lesson,
-      new Date(dto.newStartsAt),
-      new Date(dto.newEndsAt)
-    );
+    const replacement = await this.createReplacementLesson(lesson, new Date(dto.newStartsAt), new Date(dto.newEndsAt));
 
     return {
       replacement: {
@@ -562,7 +571,9 @@ export class LessonsService {
     const roster = await this.getLessonRoster(user, id);
 
     if (roster.lesson.status === LessonStatus.COMPLETED) {
-      throw new BadRequestException("Занятие уже проведено. Используйте «Изменить посещаемость» или «Отменить проведение».");
+      throw new BadRequestException(
+        "Занятие уже проведено. Используйте «Изменить посещаемость» или «Отменить проведение»."
+      );
     }
 
     let items = roster.students.map((student) => ({
@@ -619,9 +630,7 @@ export class LessonsService {
           continue;
         }
         const frozenUntil = enrollment?.frozenUntil ?? null;
-        const isFrozen = Boolean(
-          enrollment?.status === "PAUSED" && frozenUntil && frozenUntil.getTime() > Date.now()
-        );
+        const isFrozen = Boolean(enrollment?.status === "PAUSED" && frozenUntil && frozenUntil.getTime() > Date.now());
         students.push({
           studentId: membership.student.id,
           fullName: membership.student.fullName,
@@ -645,16 +654,16 @@ export class LessonsService {
         if (!isStudentEligibleForIndividualLesson(lesson.startsAt, enrollment)) {
           // Ученик ещё не начал занятия на эту дату.
         } else {
-        const frozenUntil = enrollment?.frozenUntil ?? null;
-        students.push({
-          studentId,
-          fullName: student?.fullName ?? "Студент",
-          avatarId: student?.avatarId ?? 1,
-          enrollmentId: enrollment?.id ?? null,
-          isFrozen: Boolean(enrollment?.status === "PAUSED" && frozenUntil && frozenUntil.getTime() > Date.now()),
-          frozenUntil: frozenUntil?.toISOString() ?? null,
-          freezeReason: enrollment?.freezeReason ?? null
-        });
+          const frozenUntil = enrollment?.frozenUntil ?? null;
+          students.push({
+            studentId,
+            fullName: student?.fullName ?? "Студент",
+            avatarId: student?.avatarId ?? 1,
+            enrollmentId: enrollment?.id ?? null,
+            isFrozen: Boolean(enrollment?.status === "PAUSED" && frozenUntil && frozenUntil.getTime() > Date.now()),
+            frozenUntil: frozenUntil?.toISOString() ?? null,
+            freezeReason: enrollment?.freezeReason ?? null
+          });
         }
       }
     }

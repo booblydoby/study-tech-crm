@@ -127,14 +127,10 @@ export class PaymentsService {
     let nextPaymentDue = dto.nextPaymentDue ? new Date(dto.nextPaymentDue) : existing.nextPaymentDue;
 
     const existingPeriod = existing.enrollment?.paymentPeriod;
-    const paidAtChanged =
-      dto.paidAt !== undefined && this.isDifferentCalendarDay(paidAt, existing.paidAt);
-    const lessonsChanged =
-      dto.lessonsInCycle !== undefined && dto.lessonsInCycle !== existing.lessonsInCycle;
-    const enrollmentChanged =
-      dto.enrollmentId !== undefined && dto.enrollmentId !== existing.enrollmentId;
-    const periodChanged =
-      dto.paymentPeriod !== undefined && dto.paymentPeriod !== existingPeriod;
+    const paidAtChanged = dto.paidAt !== undefined && this.isDifferentCalendarDay(paidAt, existing.paidAt);
+    const lessonsChanged = dto.lessonsInCycle !== undefined && dto.lessonsInCycle !== existing.lessonsInCycle;
+    const enrollmentChanged = dto.enrollmentId !== undefined && dto.enrollmentId !== existing.enrollmentId;
+    const periodChanged = dto.paymentPeriod !== undefined && dto.paymentPeriod !== existingPeriod;
 
     const shouldRecalculate = Boolean(
       enrollmentId && (paidAtChanged || lessonsChanged || enrollmentChanged || periodChanged)
@@ -221,10 +217,7 @@ export class PaymentsService {
     return this.prisma.payment.findMany({
       where: {
         ...this.visiblePaymentWhere(user),
-        OR: [
-          { nextPaymentDue: { gte: now, lte: until } },
-          { nextPaymentDue: null, periodTo: { gte: now, lte: until } }
-        ]
+        OR: [{ nextPaymentDue: { gte: now, lte: until } }, { nextPaymentDue: null, periodTo: { gte: now, lte: until } }]
       },
       include: { student: true, enrollment: { include: { subject: true, teacher: true, group: true } } },
       orderBy: [{ nextPaymentDue: "asc" }, { periodTo: "asc" }]

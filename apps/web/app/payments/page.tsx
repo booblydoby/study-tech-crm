@@ -9,7 +9,14 @@ import { Modal } from "@/components/modal";
 import { Select } from "@/components/ui/select";
 import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
 import { getCachedUser, type CurrentUser } from "@/lib/auth";
-import { CyclePreview, dateOnlyToIsoStartInAppTz, formatDateRu, formatSchedule, isBeforeTodayInAppTz, todayDateInputInAppTz } from "@/lib/payment-cycle";
+import {
+  CyclePreview,
+  dateOnlyToIsoStartInAppTz,
+  formatDateRu,
+  formatSchedule,
+  isBeforeTodayInAppTz,
+  todayDateInputInAppTz
+} from "@/lib/payment-cycle";
 import { ChevronDown, ChevronRight, Pencil, Plus, Trash2, Wallet } from "lucide-react";
 import { Tag, chargeStatusTag } from "@/components/ui/tag";
 
@@ -299,7 +306,8 @@ export default function PaymentsPage() {
   };
 
   const handleDeleteCharge = async (charge: Charge) => {
-    if (!confirm(`Удалить начисление ${charge.student.fullName} (${formatMoney(charge.dueAmount)}) со всеми взносами?`)) return;
+    if (!confirm(`Удалить начисление ${charge.student.fullName} (${formatMoney(charge.dueAmount)}) со всеми взносами?`))
+      return;
     try {
       await apiDelete(`/charges/${charge.id}`);
       void loadData();
@@ -347,7 +355,10 @@ export default function PaymentsPage() {
           description="Начисления за циклы и взносы. Если внесено меньше, остаётся долг; можно доплачивать частями."
         />
         {isAdmin ? (
-          <Button onClick={openCreate}><Plus size={18} />Новое начисление</Button>
+          <Button onClick={openCreate}>
+            <Plus size={18} />
+            Новое начисление
+          </Button>
         ) : null}
       </div>
 
@@ -443,7 +454,10 @@ export default function PaymentsPage() {
                                 <Wallet size={14} /> Доплатить
                               </button>
                             ) : null}
-                            <button onClick={() => void handleDeleteCharge(c)} className="text-rose-600 hover:text-rose-800">
+                            <button
+                              onClick={() => void handleDeleteCharge(c)}
+                              className="text-rose-600 hover:text-rose-800"
+                            >
                               <Trash2 size={16} />
                             </button>
                           </div>
@@ -464,9 +478,13 @@ export default function PaymentsPage() {
                             ) : (
                               <ul className="space-y-1">
                                 {c.payments.map((inst) => (
-                                  <li key={inst.id} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm">
+                                  <li
+                                    key={inst.id}
+                                    className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm"
+                                  >
                                     <span>
-                                      {formatDateRu(inst.paidAt)} · {formatMoney(inst.amount)} · {METHOD_LABEL[inst.method] ?? inst.method}
+                                      {formatDateRu(inst.paidAt)} · {formatMoney(inst.amount)} ·{" "}
+                                      {METHOD_LABEL[inst.method] ?? inst.method}
                                       {inst.comment ? ` · ${inst.comment}` : ""}
                                     </span>
                                     {isAdmin ? (
@@ -509,7 +527,11 @@ export default function PaymentsPage() {
                 required
               >
                 <option value="">Выберите студента</option>
-                {students.map((s) => <option key={s.id} value={s.id}>{s.fullName}</option>)}
+                {students.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.fullName}
+                  </option>
+                ))}
               </Select>
             </div>
 
@@ -535,7 +557,9 @@ export default function PaymentsPage() {
               >
                 <option value="">Выберите запись</option>
                 {enrollments.map((item) => (
-                  <option key={item.id} value={item.id}>{item.subject.name}</option>
+                  <option key={item.id} value={item.id}>
+                    {item.subject.name}
+                  </option>
                 ))}
               </Select>
             </div>
@@ -558,14 +582,22 @@ export default function PaymentsPage() {
             {selectedEnrollment ? (
               <div className="admin-info-box">
                 <p>Расписание: {formatSchedule(resolveEnrollmentSchedule(selectedEnrollment))}</p>
-                <p>Тариф записи: {formatMoney(selectedEnrollment.price)}{!isMonthly ? " / цикл" : " / месяц"}</p>
+                <p>
+                  Тариф записи: {formatMoney(selectedEnrollment.price)}
+                  {!isMonthly ? " / цикл" : " / месяц"}
+                </p>
               </div>
             ) : null}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1 block text-sm font-medium">Дата начала цикла *</label>
-                <Input type="date" value={form.paidAt} onChange={(e) => setForm({ ...form, paidAt: e.target.value })} required />
+                <Input
+                  type="date"
+                  value={form.paidAt}
+                  onChange={(e) => setForm({ ...form, paidAt: e.target.value })}
+                  required
+                />
               </div>
               {!isMonthly ? (
                 <div>
@@ -623,9 +655,7 @@ export default function PaymentsPage() {
             </div>
 
             {form.dueAmount > 0 && form.firstAmount < form.dueAmount ? (
-              <p className="text-sm text-amber-700">
-                Останется долг: {formatMoney(form.dueAmount - form.firstAmount)}
-              </p>
+              <p className="text-sm text-amber-700">Останется долг: {formatMoney(form.dueAmount - form.firstAmount)}</p>
             ) : form.firstAmount > form.dueAmount ? (
               <p className="text-sm text-blue-700">
                 Переплата (аванс): {formatMoney(form.firstAmount - form.dueAmount)}
@@ -646,13 +676,17 @@ export default function PaymentsPage() {
             ) : preview ? (
               <div className="admin-info-box border-emerald-500/25">
                 <p className="font-medium text-emerald-300">Период цикла</p>
-                <p>{formatDateRu(preview.periodFrom)} — {formatDateRu(preview.periodTo)}</p>
+                <p>
+                  {formatDateRu(preview.periodFrom)} — {formatDateRu(preview.periodTo)}
+                </p>
                 <p>Следующая оплата: {formatDateRu(preview.nextPaymentDue)}</p>
               </div>
             ) : null}
 
             <div className="flex justify-end gap-2 border-t pt-4">
-              <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Отмена</Button>
+              <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>
+                Отмена
+              </Button>
               <Button type="submit">Создать</Button>
             </div>
           </form>
@@ -664,8 +698,14 @@ export default function PaymentsPage() {
           {installmentCharge ? (
             <form onSubmit={submitInstallment} className="space-y-4">
               <div className="admin-info-box">
-                <p className="title">{installmentCharge.student.fullName} · {installmentCharge.enrollment?.subject?.name ?? "—"}</p>
-                <p>К оплате: {formatMoney(installmentCharge.dueAmount)} · внесено: {formatMoney(installmentCharge.paidAmount)} · долг: {formatMoney(Math.max(0, installmentCharge.balance))}</p>
+                <p className="title">
+                  {installmentCharge.student.fullName} · {installmentCharge.enrollment?.subject?.name ?? "—"}
+                </p>
+                <p>
+                  К оплате: {formatMoney(installmentCharge.dueAmount)} · внесено:{" "}
+                  {formatMoney(installmentCharge.paidAmount)} · долг:{" "}
+                  {formatMoney(Math.max(0, installmentCharge.balance))}
+                </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -674,7 +714,9 @@ export default function PaymentsPage() {
                     type="number"
                     min={1}
                     value={installmentForm.amount}
-                    onChange={(e) => setInstallmentForm({ ...installmentForm, amount: parseInt(e.target.value, 10) || 0 })}
+                    onChange={(e) =>
+                      setInstallmentForm({ ...installmentForm, amount: parseInt(e.target.value, 10) || 0 })
+                    }
                     required
                   />
                 </div>
@@ -701,10 +743,16 @@ export default function PaymentsPage() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium">Комментарий</label>
-                <Input value={installmentForm.comment} onChange={(e) => setInstallmentForm({ ...installmentForm, comment: e.target.value })} placeholder="необязательно" />
+                <Input
+                  value={installmentForm.comment}
+                  onChange={(e) => setInstallmentForm({ ...installmentForm, comment: e.target.value })}
+                  placeholder="необязательно"
+                />
               </div>
               <div className="flex justify-end gap-2 border-t pt-4">
-                <Button type="button" variant="outline" onClick={() => setInstallmentCharge(null)}>Отмена</Button>
+                <Button type="button" variant="outline" onClick={() => setInstallmentCharge(null)}>
+                  Отмена
+                </Button>
                 <Button type="submit">Сохранить взнос</Button>
               </div>
             </form>
@@ -713,11 +761,18 @@ export default function PaymentsPage() {
       ) : null}
 
       {isAdmin ? (
-        <Modal isOpen={!!editCharge} onClose={() => setEditCharge(null)} title="Изменить сумму начисления" footer={null}>
+        <Modal
+          isOpen={!!editCharge}
+          onClose={() => setEditCharge(null)}
+          title="Изменить сумму начисления"
+          footer={null}
+        >
           {editCharge ? (
             <form onSubmit={submitEditCharge} className="space-y-4">
               <div className="admin-info-box">
-                <p className="title">{editCharge.student.fullName} · {editCharge.enrollment?.subject?.name ?? "—"}</p>
+                <p className="title">
+                  {editCharge.student.fullName} · {editCharge.enrollment?.subject?.name ?? "—"}
+                </p>
                 <p>
                   Период: {formatDateRu(editCharge.periodFrom)} — {formatDateRu(editCharge.periodTo)}
                 </p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiGet } from "@/lib/api";
@@ -13,7 +13,7 @@ import {
   getEndOfMonthInAppTz,
   getStartOfMonthInAppTz,
   isBeforeTodayInAppTz,
-  isTodayInAppTz,
+  isTodayInAppTz
 } from "@/lib/payment-cycle";
 import { Tag, lessonStatusTag } from "@/components/ui/tag";
 import { cn } from "@/lib/utils";
@@ -66,17 +66,13 @@ export function StudentLessonCalendar({
   studentId,
   selectedLessonId,
   onSelectLesson,
-  refreshKey = 0,
+  refreshKey = 0
 }: StudentLessonCalendarProps) {
   const [monthRef, setMonthRef] = useState(() => getStartOfMonthInAppTz(new Date()));
   const [lessons, setLessons] = useState<StudentCalendarLesson[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    void loadLessons();
-  }, [studentId, monthRef, refreshKey]);
-
-  const loadLessons = async () => {
+  const loadLessons = useCallback(async () => {
     setLoading(true);
     try {
       const from = getStartOfMonthInAppTz(monthRef);
@@ -91,7 +87,11 @@ export function StudentLessonCalendar({
     } finally {
       setLoading(false);
     }
-  };
+  }, [studentId, monthRef]);
+
+  useEffect(() => {
+    void loadLessons();
+  }, [loadLessons, refreshKey]);
 
   const calendarDays = useMemo(() => {
     const tz = getAppTimezone();

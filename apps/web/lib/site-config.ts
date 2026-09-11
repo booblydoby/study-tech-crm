@@ -76,8 +76,7 @@ export const siteConfig = {
         },
         {
           title: "Business English",
-          description:
-            "Английский для работы: переговоры, презентации, деловая переписка и профессиональная лексика."
+          description: "Английский для работы: переговоры, презентации, деловая переписка и профессиональная лексика."
         }
       ],
       forWhom: [
@@ -160,8 +159,7 @@ export const siteConfig = {
         },
         {
           title: "Разговорный китайский",
-          description:
-            "Живая речь, произношение и tones, практика в диалогах — для поездок, учёбы и делового общения."
+          description: "Живая речь, произношение и tones, практика в диалогах — для поездок, учёбы и делового общения."
         },
         {
           title: "Иероглифика",
@@ -204,8 +202,7 @@ export const siteConfig = {
     landmark: "Учебный центр Study Tech",
     lat: 41.2785,
     lng: 69.3045,
-    mapsUrl:
-      "https://yandex.ru/maps/org/study_tech/234839343501?si=chg6q949g8bh083e2pb1n3jr74"
+    mapsUrl: "https://yandex.ru/maps/org/study_tech/234839343501?si=chg6q949g8bh083e2pb1n3jr74"
   },
 
   contacts: {

@@ -74,7 +74,7 @@ export default function EnrollmentsPage() {
             e.teacher?.fullName || "—",
             (e.price / 1000).toFixed(0) + "K сум",
             paymentLabels[e.paymentPeriod] ?? e.paymentPeriod,
-            statusLabels[e.status] ?? e.status,
+            statusLabels[e.status] ?? e.status
           ])}
         />
       )}

@@ -14,8 +14,10 @@ export function AuthGuard({ allowedRoles, children }: { allowedRoles?: AppRole[]
       return;
     }
 
+    const allowed = allowedRoleKey ? allowedRoleKey.split("|") : null;
+
     const cached = getCachedUser();
-    if (cached && (!allowedRoles?.length || allowedRoles.includes(cached.role))) {
+    if (cached && (!allowed || allowed.includes(cached.role))) {
       setUser(cached);
       setReady(true);
     }
@@ -26,8 +28,9 @@ export function AuthGuard({ allowedRoles, children }: { allowedRoles?: AppRole[]
           window.location.href = "/login";
           return;
         }
-        if (allowedRoles?.length && !allowedRoles.includes(fresh.role)) {
-          window.location.href = fresh.role === "TEACHER" ? "/teacher" : fresh.role === "STUDENT" ? "/student" : "/dashboard";
+        if (allowed && !allowed.includes(fresh.role)) {
+          window.location.href =
+            fresh.role === "TEACHER" ? "/teacher" : fresh.role === "STUDENT" ? "/student" : "/dashboard";
           return;
         }
         setUser(fresh);

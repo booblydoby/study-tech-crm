@@ -9,10 +9,8 @@ const prisma = new PrismaClient();
  * Запуск: pnpm --filter @study-crm/api prisma:reset  (или pnpm db:reset из корня)
  */
 async function main() {
-  const adminEmail =
-    process.env.ADMIN_EMAIL ?? process.env.SUPER_ADMIN_EMAIL ?? "admin@study.local";
-  const adminPassword =
-    process.env.ADMIN_PASSWORD ?? process.env.SUPER_ADMIN_PASSWORD ?? "ChangeMe123!";
+  const adminEmail = process.env.ADMIN_EMAIL ?? process.env.SUPER_ADMIN_EMAIL ?? "admin@study.local";
+  const adminPassword = process.env.ADMIN_PASSWORD ?? process.env.SUPER_ADMIN_PASSWORD ?? "ChangeMe123!";
 
   // Удаляем данные в порядке, безопасном для внешних ключей.
   await prisma.attendance.deleteMany();
@@ -33,9 +31,7 @@ async function main() {
 
   // Гарантируем наличие ролей.
   const roles = await Promise.all(
-    Object.values(RoleName).map((name) =>
-      prisma.role.upsert({ where: { name }, create: { name }, update: {} })
-    )
+    Object.values(RoleName).map((name) => prisma.role.upsert({ where: { name }, create: { name }, update: {} }))
   );
   const roleByName = new Map(roles.map((role) => [role.name, role]));
 

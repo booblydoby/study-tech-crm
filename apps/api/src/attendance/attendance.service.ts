@@ -1,10 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { AttendanceStatus, LessonStatus, RoleName } from "@prisma/client";
 import { AuthUser } from "../common/decorators/current-user.decorator";
-import {
-  isStudentEligibleForGroupLesson,
-  isStudentEligibleForIndividualLesson
-} from "../common/utils/lesson-schedule";
+import { isStudentEligibleForGroupLesson, isStudentEligibleForIndividualLesson } from "../common/utils/lesson-schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { MarkAttendanceDto } from "./attendance.dto";
 
@@ -15,14 +12,20 @@ export class AttendanceService {
   constructor(private readonly prisma: PrismaService) {}
 
   findAll() {
-    return this.prisma.attendance.findMany({ include: { student: true, lesson: true }, orderBy: { createdAt: "desc" } });
+    return this.prisma.attendance.findMany({
+      include: { student: true, lesson: true },
+      orderBy: { createdAt: "desc" }
+    });
   }
 
   private async assertCanAccessLesson(user: AuthUser, lessonId: string) {
     if (user.role === RoleName.ADMIN) return;
     if (user.role === RoleName.TEACHER) {
       if (!user.teacherId) throw new ForbiddenException("Teacher profile is required");
-      const lesson = await this.prisma.lesson.findFirst({ where: { id: lessonId, teacherId: user.teacherId }, select: { id: true } });
+      const lesson = await this.prisma.lesson.findFirst({
+        where: { id: lessonId, teacherId: user.teacherId },
+        select: { id: true }
+      });
       if (!lesson) throw new NotFoundException("Lesson not found");
       return;
     }
@@ -190,7 +193,13 @@ export class AttendanceService {
       dto.items.map((item) =>
         this.prisma.attendance.upsert({
           where: { lessonId_studentId: { lessonId, studentId: item.studentId } },
-          create: { lessonId, studentId: item.studentId, status: item.status, comment: item.comment, markedById: user.sub },
+          create: {
+            lessonId,
+            studentId: item.studentId,
+            status: item.status,
+            comment: item.comment,
+            markedById: user.sub
+          },
           update: { status: item.status, comment: item.comment, markedById: user.sub }
         })
       )
@@ -205,7 +214,11 @@ export class AttendanceService {
 
   async byLesson(user: AuthUser, lessonId: string) {
     await this.assertCanAccessLesson(user, lessonId);
-    return this.prisma.attendance.findMany({ where: { lessonId }, include: { student: true }, orderBy: { student: { fullName: "asc" } } });
+    return this.prisma.attendance.findMany({
+      where: { lessonId },
+      include: { student: true },
+      orderBy: { student: { fullName: "asc" } }
+    });
   }
 
   /**

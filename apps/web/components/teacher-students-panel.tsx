@@ -45,9 +45,7 @@ const dayOptions = [
 ];
 
 const slotId = () =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2);
+  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2);
 
 function scheduleToSlots(pattern: unknown): EditorSlot[] {
   const make = (s: { daysOfWeek?: number[]; time?: string; duration?: number }): EditorSlot => ({
@@ -235,7 +233,9 @@ export function TeacherStudentsPanel({
       >
         {scheduleTarget && (
           <div className="space-y-4">
-            <p className="text-sm text-slate-600">{scheduleTarget.student.fullName} · {scheduleTarget.subject.name}</p>
+            <p className="text-sm text-slate-600">
+              {scheduleTarget.student.fullName} · {scheduleTarget.subject.name}
+            </p>
             {editorSlots.map((slot, index) => (
               <div key={slot.id} className="space-y-2 rounded-lg border p-3">
                 <p className="text-xs font-medium text-slate-500">Слот {index + 1}</p>
@@ -267,20 +267,35 @@ export function TeacherStudentsPanel({
                   ))}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input type="time" value={slot.time} onChange={(ev) =>
-                    setEditorSlots((prev) => prev.map((s) => (s.id === slot.id ? { ...s, time: ev.target.value } : s)))
-                  } />
-                  <Input type="number" value={slot.duration} onChange={(ev) =>
-                    setEditorSlots((prev) =>
-                      prev.map((s) => (s.id === slot.id ? { ...s, duration: parseInt(ev.target.value, 10) || 60 } : s))
-                    )
-                  } placeholder="мин" />
+                  <Input
+                    type="time"
+                    value={slot.time}
+                    onChange={(ev) =>
+                      setEditorSlots((prev) =>
+                        prev.map((s) => (s.id === slot.id ? { ...s, time: ev.target.value } : s))
+                      )
+                    }
+                  />
+                  <Input
+                    type="number"
+                    value={slot.duration}
+                    onChange={(ev) =>
+                      setEditorSlots((prev) =>
+                        prev.map((s) =>
+                          s.id === slot.id ? { ...s, duration: parseInt(ev.target.value, 10) || 60 } : s
+                        )
+                      )
+                    }
+                    placeholder="мин"
+                  />
                 </div>
               </div>
             ))}
             <button
               type="button"
-              onClick={() => setEditorSlots((prev) => [...prev, { id: slotId(), days: [], time: "17:30", duration: 90 }])}
+              onClick={() =>
+                setEditorSlots((prev) => [...prev, { id: slotId(), days: [], time: "17:30", duration: 90 }])
+              }
               className="text-sm text-primary hover:underline"
             >
               + Добавить время

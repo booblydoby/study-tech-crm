@@ -11,7 +11,7 @@ interface RoleButtonProps {
 
 export function RoleButton({ children, allowedRoles, className }: RoleButtonProps) {
   const user = getCachedUser();
-  
+
   if (!user || !allowedRoles.includes(user.role)) {
     return null;
   }

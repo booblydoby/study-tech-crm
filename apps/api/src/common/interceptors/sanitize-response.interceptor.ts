@@ -6,6 +6,6 @@ import { stripSensitiveFields } from "../utils/sanitize";
 @Injectable()
 export class SanitizeResponseInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    return next.handle().pipe(map((data) => stripSensitiveFields(data)));
+    return next.handle().pipe(map((data: unknown) => stripSensitiveFields(data)));
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { apiGet } from "@/lib/api";
 import { formatDateRu, getStartOfMonthInAppTz } from "@/lib/payment-cycle";
@@ -64,11 +64,7 @@ export function TeacherEarnings({ teacherId }: TeacherEarningsProps) {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<"month" | "all">("month");
 
-  useEffect(() => {
-    void load();
-  }, [teacherId, period]);
-
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const now = new Date();
@@ -87,7 +83,11 @@ export function TeacherEarnings({ teacherId }: TeacherEarningsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [teacherId, period]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   if (loading) {
     return <div className="py-8 text-center text-slate-500">Загрузка...</div>;
@@ -122,7 +122,8 @@ export function TeacherEarnings({ teacherId }: TeacherEarningsProps) {
       </div>
 
       <div className="rounded-lg border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900">
-        Ваша доля начисляется сразу при каждой оплате ученика — процент указан в записи (например, 50% от суммы платежа).
+        Ваша доля начисляется сразу при каждой оплате ученика — процент указан в записи (например, 50% от суммы
+        платежа).
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -155,7 +156,10 @@ export function TeacherEarnings({ teacherId }: TeacherEarningsProps) {
           <h3 className="mb-3 font-medium">Ближайшие оплаты (14 дней)</h3>
           <div className="space-y-2">
             {data.upcomingPayments.map((item) => (
-              <Card key={`${item.studentName}-${item.dueDate}`} className="flex flex-wrap items-center justify-between gap-2 p-3">
+              <Card
+                key={`${item.studentName}-${item.dueDate}`}
+                className="flex flex-wrap items-center justify-between gap-2 p-3"
+              >
                 <div>
                   <p className="font-medium">{item.studentName}</p>
                   <p className="text-sm text-slate-500">
@@ -177,7 +181,10 @@ export function TeacherEarnings({ teacherId }: TeacherEarningsProps) {
           <h3 className="mb-3 font-medium text-rose-700">Должники</h3>
           <div className="space-y-2">
             {data.debtors.map((item) => (
-              <Card key={`${item.studentName}-debt`} className="flex flex-wrap items-center justify-between gap-2 border-rose-100 p-3">
+              <Card
+                key={`${item.studentName}-debt`}
+                className="flex flex-wrap items-center justify-between gap-2 border-rose-100 p-3"
+              >
                 <div>
                   <p className="font-medium">{item.studentName}</p>
                   <p className="text-sm text-slate-500">{item.subjectName}</p>
@@ -214,9 +221,7 @@ export function TeacherEarnings({ teacherId }: TeacherEarningsProps) {
                       {row.commission}%
                     </p>
                     {row.nextPaymentDue && (
-                      <p className="mt-1 text-xs text-slate-400">
-                        След. оплата: {formatDateRu(row.nextPaymentDue)}
-                      </p>
+                      <p className="mt-1 text-xs text-slate-400">След. оплата: {formatDateRu(row.nextPaymentDue)}</p>
                     )}
                   </div>
                   <div className="grid gap-1 text-right text-sm sm:min-w-[180px]">

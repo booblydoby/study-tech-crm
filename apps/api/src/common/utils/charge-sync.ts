@@ -18,11 +18,7 @@ export async function recomputeChargeStatus(prisma: PrismaService, chargeId: str
 }
 
 /** Пересчитывает сумму и статус незакрытых начислений после смены тарифа записи. */
-export async function syncOpenChargesForEnrollment(
-  prisma: PrismaService,
-  enrollmentId: string,
-  dueAmount: number
-) {
+export async function syncOpenChargesForEnrollment(prisma: PrismaService, enrollmentId: string, dueAmount: number) {
   const charges = await prisma.charge.findMany({
     where: {
       enrollmentId,

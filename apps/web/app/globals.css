@@ -178,7 +178,10 @@ body {
 }
 
 .landing-feature-card {
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
 }
 
 .landing-feature-card:hover {
@@ -196,7 +199,10 @@ body {
   color: #fff;
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .landing-input::placeholder {
@@ -210,18 +216,34 @@ body {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-18px) scale(1.03); }
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-18px) scale(1.03);
+  }
 }
 
 @keyframes gradient-x {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(28px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Admin panel (matches landing) ── */
@@ -247,7 +269,10 @@ body {
   padding: 0 0.75rem;
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.55);
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
   border: 1px solid transparent;
 }
 
@@ -271,7 +296,11 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-  transition: border-color 0.22s ease, background 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
 }
 
 .admin-card:hover:not(.admin-lesson-row):not(.admin-table-row) {
@@ -309,11 +338,21 @@ body {
   animation: fade-up 0.45s ease-out both;
 }
 
-.admin-stagger > *:nth-child(1) { animation-delay: 0.03s; }
-.admin-stagger > *:nth-child(2) { animation-delay: 0.06s; }
-.admin-stagger > *:nth-child(3) { animation-delay: 0.09s; }
-.admin-stagger > *:nth-child(4) { animation-delay: 0.12s; }
-.admin-stagger > *:nth-child(5) { animation-delay: 0.15s; }
+.admin-stagger > *:nth-child(1) {
+  animation-delay: 0.03s;
+}
+.admin-stagger > *:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.admin-stagger > *:nth-child(3) {
+  animation-delay: 0.09s;
+}
+.admin-stagger > *:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.admin-stagger > *:nth-child(5) {
+  animation-delay: 0.15s;
+}
 
 /* ── Unified tags / badges ── */
 
@@ -328,7 +367,9 @@ body {
   line-height: 1.2;
   border: 1px solid transparent;
   white-space: nowrap;
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .admin-tag-success {
@@ -457,7 +498,10 @@ body {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.025) 100%);
   padding: 1.25rem;
   backdrop-filter: blur(12px);
-  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .admin-stat-card:hover {
@@ -489,7 +533,10 @@ body {
   font-size: 0.875rem;
   color: #fff;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .admin-input::placeholder {
@@ -538,7 +585,9 @@ body {
   color: #fff;
   outline: none;
   color-scheme: dark;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .admin-select:focus {
@@ -878,7 +927,12 @@ body {
 }
 
 @keyframes map-pulse {
-  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.7; }
-  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0;
+  }
 }
-

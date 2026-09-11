@@ -7,7 +7,7 @@
     "dev": "pnpm --parallel --filter @study-crm/api --filter @study-crm/web dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css,prisma}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\"",
     "setup": "pnpm install && pnpm db:generate && pnpm db:migrate:deploy && pnpm db:seed",
     "db:generate": "pnpm --filter @study-crm/api prisma:generate",
     "db:migrate": "pnpm --filter @study-crm/api prisma:migrate",

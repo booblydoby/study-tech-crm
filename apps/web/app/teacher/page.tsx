@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import {
-  CalendarDays,
-  Clock,
-  Sparkles,
-  Users,
-  Wallet,
-  XCircle
-} from "lucide-react";
+import { CalendarDays, Clock, Sparkles, Users, Wallet, XCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
@@ -19,7 +12,14 @@ import { TeacherEarnings } from "@/components/teacher-earnings";
 import { TeacherStudentsPanel, type TeacherEnrollment } from "@/components/teacher-students-panel";
 import { apiGet } from "@/lib/api";
 import { getCurrentUser, type CurrentUser } from "@/lib/auth";
-import { formatDateWithWeekdayRu, formatTimeRu, getStartOfDayInAppTz, getEndOfDayInAppTz, addAppDays, isSameAppDay } from "@/lib/payment-cycle";
+import {
+  formatDateWithWeekdayRu,
+  formatTimeRu,
+  getStartOfDayInAppTz,
+  getEndOfDayInAppTz,
+  addAppDays,
+  isSameAppDay
+} from "@/lib/payment-cycle";
 
 interface Lesson {
   id: string;
@@ -94,9 +94,7 @@ export default function TeacherWorkspacePage() {
 
   const todayLessons = useMemo(
     () =>
-      lessons
-        .filter((l) => isSameAppDay(l.startsAt, new Date()))
-        .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
+      lessons.filter((l) => isSameAppDay(l.startsAt, new Date())).sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
     [lessons]
   );
 

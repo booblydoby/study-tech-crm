@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Modal } from "@/components/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/avatar";
 import { apiGet, apiPost } from "@/lib/api";
-import { dateOnlyToIsoStartInAppTz, formatDateWithWeekdayRu, formatTimeRu, lessonStatusLabelRu } from "@/lib/payment-cycle";
+import {
+  dateOnlyToIsoStartInAppTz,
+  formatDateWithWeekdayRu,
+  formatTimeRu,
+  lessonStatusLabelRu
+} from "@/lib/payment-cycle";
 import { Snowflake, Undo2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +51,7 @@ const statusOptions: Array<{ value: AttendanceStatus; label: string; activeClass
   { value: "PRESENT", label: "Был", activeClass: "admin-chip-active-present" },
   { value: "ABSENT", label: "Пропуск", activeClass: "admin-chip-active-absent" },
   { value: "LATE", label: "Опоздал", activeClass: "admin-chip-active-late" },
-  { value: "EXCUSED", label: "Уважит.", activeClass: "admin-chip-active-excused" },
+  { value: "EXCUSED", label: "Уважит.", activeClass: "admin-chip-active-excused" }
 ];
 
 export function LessonAttendanceModal({ isOpen, onClose, lessonId, onSuccess }: LessonAttendanceModalProps) {
@@ -59,11 +64,7 @@ export function LessonAttendanceModal({ isOpen, onClose, lessonId, onSuccess }: 
   const [freezeUntil, setFreezeUntil] = useState("");
   const [freezeReason, setFreezeReason] = useState("");
 
-  useEffect(() => {
-    if (isOpen && lessonId) void loadRoster();
-  }, [isOpen, lessonId]);
-
-  const loadRoster = async () => {
+  const loadRoster = useCallback(async () => {
     setLoading(true);
     try {
       const data = await apiGet<LessonRoster>(`/lessons/${lessonId}/roster`);
@@ -81,7 +82,11 @@ export function LessonAttendanceModal({ isOpen, onClose, lessonId, onSuccess }: 
     } finally {
       setLoading(false);
     }
-  };
+  }, [lessonId]);
+
+  useEffect(() => {
+    if (isOpen && lessonId) void loadRoster();
+  }, [isOpen, lessonId, loadRoster]);
 
   const handleSave = async () => {
     if (!roster) return;
@@ -94,9 +99,9 @@ export function LessonAttendanceModal({ isOpen, onClose, lessonId, onSuccess }: 
       await apiPost(`/attendance/lesson/${lessonId}`, {
         items: roster.students.map((student) => ({
           studentId: student.studentId,
-          status: statuses[student.studentId] ?? "ABSENT",
+          status: statuses[student.studentId] ?? "ABSENT"
         })),
-        completeLesson,
+        completeLesson
       });
       onSuccess();
       onClose();
@@ -138,7 +143,7 @@ export function LessonAttendanceModal({ isOpen, onClose, lessonId, onSuccess }: 
         };
       }>(`/enrollments/${freezeFor.enrollmentId}/freeze`, {
         frozenUntil: dateOnlyToIsoStartInAppTz(freezeUntil),
-        reason: freezeReason.trim(),
+        reason: freezeReason.trim()
       });
       setFreezeFor(null);
       setFreezeUntil("");
@@ -286,10 +291,7 @@ export function LessonAttendanceModal({ isOpen, onClose, lessonId, onSuccess }: 
                         key={option.value}
                         type="button"
                         onClick={() => setStatuses((prev) => ({ ...prev, [student.studentId]: option.value }))}
-                        className={cn(
-                          "admin-chip",
-                          statuses[student.studentId] === option.value && option.activeClass
-                        )}
+                        className={cn("admin-chip", statuses[student.studentId] === option.value && option.activeClass)}
                       >
                         {option.label}
                       </button>

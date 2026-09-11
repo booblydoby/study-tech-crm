@@ -76,7 +76,10 @@ export default function DashboardPage() {
 
   return (
     <AppShell allowedRoles={["ADMIN"]}>
-      <PageHeader title="Панель управления" description="Обзор работы учебного центра — студенты, финансы и посещаемость." />
+      <PageHeader
+        title="Панель управления"
+        description="Обзор работы учебного центра — студенты, финансы и посещаемость."
+      />
 
       {loading ? (
         <div className="py-16 text-center text-white/45">Загрузка...</div>
@@ -115,7 +118,10 @@ export default function DashboardPage() {
                     </div>
                     <span className="font-medium text-white/90">{link.label}</span>
                   </div>
-                  <ArrowRight size={16} className="text-white/30 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-yellow" />
+                  <ArrowRight
+                    size={16}
+                    className="text-white/30 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-yellow"
+                  />
                 </Link>
               ))}
             </div>

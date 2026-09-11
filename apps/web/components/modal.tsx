@@ -16,7 +16,7 @@ interface ModalProps {
 const sizeClass = {
   md: "max-w-2xl",
   lg: "max-w-4xl",
-  xl: "max-w-5xl",
+  xl: "max-w-5xl"
 };
 
 export function Modal({ isOpen, onClose, title, children, footer, size = "md" }: ModalProps) {
@@ -35,11 +35,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = "md" }:
 
   return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden
-      />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-hidden />
 
       <div
         role="dialog"

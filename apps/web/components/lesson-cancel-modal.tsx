@@ -16,12 +16,7 @@ interface LessonCancelModalProps {
 type CancellationType = "TEACHER" | "STUDENT" | "WEATHER" | "ILLNESS" | "OTHER";
 type CancelAction = "add_debt" | "reschedule" | "adjust_payment";
 
-export function LessonCancelModal({
-  isOpen,
-  onClose,
-  lessonId,
-  onSuccess,
-}: LessonCancelModalProps) {
+export function LessonCancelModal({ isOpen, onClose, lessonId, onSuccess }: LessonCancelModalProps) {
   const [loading, setLoading] = useState(false);
   const [reason, setReason] = useState("");
   const [cancellationType, setCancellationType] = useState<CancellationType>("OTHER");
@@ -116,9 +111,7 @@ export function LessonCancelModal({
     >
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Тип отмены
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Тип отмены</label>
           <select
             value={cancellationType}
             onChange={(e) => setCancellationType(e.target.value as CancellationType)}
@@ -133,9 +126,7 @@ export function LessonCancelModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Причина отмены *
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Причина отмены *</label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
@@ -146,9 +137,7 @@ export function LessonCancelModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Действие после отмены
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Действие после отмены</label>
           <div className="space-y-2">
             <label className="flex items-center gap-3 p-3 border rounded-md cursor-pointer hover:bg-slate-50">
               <input
@@ -161,9 +150,7 @@ export function LessonCancelModal({
               />
               <div>
                 <div className="font-medium">Добавить в долги</div>
-                <div className="text-sm text-slate-500">
-                  Занятие будет добавлено в графу долгов студента
-                </div>
+                <div className="text-sm text-slate-500">Занятие будет добавлено в графу долгов студента</div>
               </div>
             </label>
 
@@ -178,9 +165,7 @@ export function LessonCancelModal({
               />
               <div>
                 <div className="font-medium">Перенести занятие</div>
-                <div className="text-sm text-slate-500">
-                  Создать новое занятие взамен отмененного
-                </div>
+                <div className="text-sm text-slate-500">Создать новое занятие взамен отмененного</div>
               </div>
             </label>
 
@@ -195,9 +180,7 @@ export function LessonCancelModal({
               />
               <div>
                 <div className="font-medium">Сдвинуть оплату</div>
-                <div className="text-sm text-slate-500">
-                  Дата оплаты будет сдвинута на дополнительное занятие
-                </div>
+                <div className="text-sm text-slate-500">Дата оплаты будет сдвинута на дополнительное занятие</div>
               </div>
             </label>
           </div>
@@ -206,9 +189,7 @@ export function LessonCancelModal({
         {action === "reschedule" && (
           <div className="space-y-3 p-3 bg-slate-50 rounded-md">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Новая дата
-                </label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Новая дата</label>
               <input
                 type="date"
                 value={newDate}
@@ -217,9 +198,7 @@ export function LessonCancelModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Время начала
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Время начала</label>
               <input
                 type="time"
                 value={newTime}

@@ -44,14 +44,7 @@ export function getTimeZoneOffsetMs(instant: Date, timeZone: string): number {
   });
   const parts = dtf.formatToParts(instant);
   const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0);
-  const asUtc = Date.UTC(
-    get("year"),
-    get("month") - 1,
-    get("day"),
-    get("hour"),
-    get("minute"),
-    get("second")
-  );
+  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
   return asUtc - instant.getTime();
 }
 

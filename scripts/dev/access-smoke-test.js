@@ -59,101 +59,161 @@ async function main() {
   await cleanup();
 
   const admin = await login("admin@study.local", "ChangeMe123!");
-  const teacherUser1 = (await api("/users", {
-    method: "POST",
-    token: admin,
-    body: { email: "smoke-teacher1@study.local", password: "Teacher123!", fullName: "Smoke Teacher One", role: "TEACHER" }
-  })).data;
-  const teacherUser2 = (await api("/users", {
-    method: "POST",
-    token: admin,
-    body: { email: "smoke-teacher2@study.local", password: "Teacher123!", fullName: "Smoke Teacher Two", role: "TEACHER" }
-  })).data;
-  const teacher1 = (await api("/teachers", {
-    method: "POST",
-    token: admin,
-    body: { fullName: "Smoke Teacher One", email: "smoke-teacher1@study.local", userId: teacherUser1.id }
-  })).data;
-  const teacher2 = (await api("/teachers", {
-    method: "POST",
-    token: admin,
-    body: { fullName: "Smoke Teacher Two", email: "smoke-teacher2@study.local", userId: teacherUser2.id }
-  })).data;
-  const subject = (await api("/subjects", {
-    method: "POST",
-    token: admin,
-    body: { name: "Smoke English" }
-  })).data;
-  const group = (await api("/groups", {
-    method: "POST",
-    token: admin,
-    body: { name: "Smoke Group", subjectId: subject.id, monthlyPrice: 500000 }
-  })).data;
+  const teacherUser1 = (
+    await api("/users", {
+      method: "POST",
+      token: admin,
+      body: {
+        email: "smoke-teacher1@study.local",
+        password: "Teacher123!",
+        fullName: "Smoke Teacher One",
+        role: "TEACHER"
+      }
+    })
+  ).data;
+  const teacherUser2 = (
+    await api("/users", {
+      method: "POST",
+      token: admin,
+      body: {
+        email: "smoke-teacher2@study.local",
+        password: "Teacher123!",
+        fullName: "Smoke Teacher Two",
+        role: "TEACHER"
+      }
+    })
+  ).data;
+  const teacher1 = (
+    await api("/teachers", {
+      method: "POST",
+      token: admin,
+      body: { fullName: "Smoke Teacher One", email: "smoke-teacher1@study.local", userId: teacherUser1.id }
+    })
+  ).data;
+  const teacher2 = (
+    await api("/teachers", {
+      method: "POST",
+      token: admin,
+      body: { fullName: "Smoke Teacher Two", email: "smoke-teacher2@study.local", userId: teacherUser2.id }
+    })
+  ).data;
+  const subject = (
+    await api("/subjects", {
+      method: "POST",
+      token: admin,
+      body: { name: "Smoke English" }
+    })
+  ).data;
+  const group = (
+    await api("/groups", {
+      method: "POST",
+      token: admin,
+      body: { name: "Smoke Group", subjectId: subject.id, monthlyPrice: 500000 }
+    })
+  ).data;
   await api(`/groups/${group.id}/teachers`, { method: "POST", token: admin, body: { teacherId: teacher1.id } });
 
-  const student1 = (await api("/students", {
-    method: "POST",
-    token: admin,
-    body: { fullName: "Smoke Student One", login: "smoke-student1", password: "Student123!" }
-  })).data;
-  const student2 = (await api("/students", {
-    method: "POST",
-    token: admin,
-    body: { fullName: "Smoke Student Two", login: "smoke-student2", password: "Student123!" }
-  })).data;
-  const enrollment = (await api("/enrollments", {
-    method: "POST",
-    token: admin,
-    body: {
-      studentId: student1.id,
-      subjectId: subject.id,
-      teacherId: teacher1.id,
-      groupId: group.id,
-      type: "GROUP",
-      price: 500000,
-      teacherCommission: 30,
-      totalLessons: 12
-    }
-  })).data;
-  const lesson = (await api("/lessons", {
-    method: "POST",
-    token: admin,
-    body: {
-      type: "GROUP",
-      enrollmentId: enrollment.id,
-      groupId: group.id,
-      teacherId: teacher1.id,
-      subjectId: subject.id,
-      startsAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-      endsAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
-    }
-  })).data;
-  const payment = (await api("/payments", {
-    method: "POST",
-    token: admin,
-    body: {
-      studentId: student1.id,
-      enrollmentId: enrollment.id,
-      amount: 500000,
-      method: "CASH",
-      paidAt: new Date().toISOString(),
-      periodFrom: new Date().toISOString(),
-      periodTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-    }
-  })).data;
+  const student1 = (
+    await api("/students", {
+      method: "POST",
+      token: admin,
+      body: { fullName: "Smoke Student One", login: "smoke-student1", password: "Student123!" }
+    })
+  ).data;
+  const student2 = (
+    await api("/students", {
+      method: "POST",
+      token: admin,
+      body: { fullName: "Smoke Student Two", login: "smoke-student2", password: "Student123!" }
+    })
+  ).data;
+  const enrollment = (
+    await api("/enrollments", {
+      method: "POST",
+      token: admin,
+      body: {
+        studentId: student1.id,
+        subjectId: subject.id,
+        teacherId: teacher1.id,
+        groupId: group.id,
+        type: "GROUP",
+        price: 500000,
+        teacherCommission: 30,
+        totalLessons: 12
+      }
+    })
+  ).data;
+  const lesson = (
+    await api("/lessons", {
+      method: "POST",
+      token: admin,
+      body: {
+        type: "GROUP",
+        enrollmentId: enrollment.id,
+        groupId: group.id,
+        teacherId: teacher1.id,
+        subjectId: subject.id,
+        startsAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+        endsAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
+      }
+    })
+  ).data;
+  const payment = (
+    await api("/payments", {
+      method: "POST",
+      token: admin,
+      body: {
+        studentId: student1.id,
+        enrollmentId: enrollment.id,
+        amount: 500000,
+        method: "CASH",
+        paidAt: new Date().toISOString(),
+        periodFrom: new Date().toISOString(),
+        periodTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    })
+  ).data;
 
   const teacherToken1 = await login("smoke-teacher1@study.local", "Teacher123!");
   const teacherToken2 = await login("smoke-teacher2@study.local", "Teacher123!");
   const studentToken1 = await login("smoke-student1", "Student123!");
   const studentToken2 = await login("smoke-student2", "Student123!");
 
-  assertStatus("teacher can read own lesson", (await api(`/lessons/${lesson.id}`, { token: teacherToken1, allowError: true })).status, 200);
-  assertStatus("other teacher cannot read lesson", (await api(`/lessons/${lesson.id}`, { token: teacherToken2, allowError: true })).status, 404);
-  assertStatus("student in group can read lesson", (await api(`/lessons/${lesson.id}`, { token: studentToken1, allowError: true })).status, 200);
-  assertStatus("other student cannot read lesson", (await api(`/lessons/${lesson.id}`, { token: studentToken2, allowError: true })).status, 404);
-  assertStatus("teacher cannot read other teacher earnings", (await api(`/enrollments/teacher/${teacher1.id}/earnings`, { token: teacherToken2, allowError: true })).status, 403);
-  assertStatus("student cannot read other payment", (await api(`/payments/${payment.id}`, { token: studentToken2, allowError: true })).status, 404);
-  assertStatus("student cannot open admin analytics", (await api("/analytics/dashboard", { token: studentToken1, allowError: true })).status, 403);
+  assertStatus(
+    "teacher can read own lesson",
+    (await api(`/lessons/${lesson.id}`, { token: teacherToken1, allowError: true })).status,
+    200
+  );
+  assertStatus(
+    "other teacher cannot read lesson",
+    (await api(`/lessons/${lesson.id}`, { token: teacherToken2, allowError: true })).status,
+    404
+  );
+  assertStatus(
+    "student in group can read lesson",
+    (await api(`/lessons/${lesson.id}`, { token: studentToken1, allowError: true })).status,
+    200
+  );
+  assertStatus(
+    "other student cannot read lesson",
+    (await api(`/lessons/${lesson.id}`, { token: studentToken2, allowError: true })).status,
+    404
+  );
+  assertStatus(
+    "teacher cannot read other teacher earnings",
+    (await api(`/enrollments/teacher/${teacher1.id}/earnings`, { token: teacherToken2, allowError: true })).status,
+    403
+  );
+  assertStatus(
+    "student cannot read other payment",
+    (await api(`/payments/${payment.id}`, { token: studentToken2, allowError: true })).status,
+    404
+  );
+  assertStatus(
+    "student cannot open admin analytics",
+    (await api("/analytics/dashboard", { token: studentToken1, allowError: true })).status,
+    403
+  );
 
   await cleanup();
 }

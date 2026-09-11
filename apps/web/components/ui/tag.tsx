@@ -1,13 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export type TagVariant =
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "neutral"
-  | "brand"
-  | "group";
+export type TagVariant = "success" | "warning" | "danger" | "info" | "neutral" | "brand" | "group";
 
 const variantClass: Record<TagVariant, string> = {
   success: "admin-tag-success",

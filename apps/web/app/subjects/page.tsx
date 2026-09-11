@@ -29,7 +29,9 @@ export default function SubjectsPage() {
   const [editActive, setEditActive] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
 
-  useEffect(() => { loadSubjects(); }, []);
+  useEffect(() => {
+    loadSubjects();
+  }, []);
 
   const loadSubjects = async () => {
     setLoading(true);
@@ -80,7 +82,7 @@ export default function SubjectsPage() {
       await apiPatch(`/subjects/${editSubject.id}`, {
         name: editName,
         description: editDescription || undefined,
-        isActive: editActive,
+        isActive: editActive
       });
       setEditSubject(null);
       loadSubjects();
@@ -96,7 +98,10 @@ export default function SubjectsPage() {
     <AppShell allowedRoles={["ADMIN"]}>
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Предметы" description="Математика, английский и другие направления." />
-        <Button onClick={() => setIsModalOpen(true)}><Plus size={18} />New subject</Button>
+        <Button onClick={() => setIsModalOpen(true)}>
+          <Plus size={18} />
+          New subject
+        </Button>
       </div>
 
       {loading ? (
@@ -116,22 +121,24 @@ export default function SubjectsPage() {
               {subjects.map((s) => (
                 <tr key={s.id} className="border-b hover:bg-slate-50">
                   <td className="px-4 py-3">
-                    <button
-                      onClick={() => openEdit(s)}
-                      className="font-medium text-blue-600 hover:underline text-left"
-                    >
+                    <button onClick={() => openEdit(s)} className="font-medium text-blue-600 hover:underline text-left">
                       {s.name}
                     </button>
                   </td>
                   <td className="px-4 py-3 text-slate-600">{s.description || "-"}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs px-2 py-0.5 rounded ${s.isActive ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded ${s.isActive ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}
+                    >
                       {s.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleDelete(s.id, s.name)}
-                      className="p-1.5 rounded hover:bg-red-50 text-red-500" title="Delete">
+                    <button
+                      onClick={() => handleDelete(s.id, s.name)}
+                      className="p-1.5 rounded hover:bg-red-50 text-red-500"
+                      title="Delete"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </td>
@@ -147,21 +154,37 @@ export default function SubjectsPage() {
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
-            <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="English" required />
+            <Input
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="English"
+              required
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-            <Input value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="General English course" />
+            <Input
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="General English course"
+            />
           </div>
           <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
             <Button type="submit">Create</Button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Subject Modal */}
-      <Modal isOpen={!!editSubject} onClose={() => setEditSubject(null)} title={`Edit: ${editSubject?.name || ""}`} footer={null}>
+      <Modal
+        isOpen={!!editSubject}
+        onClose={() => setEditSubject(null)}
+        title={`Edit: ${editSubject?.name || ""}`}
+        footer={null}
+      >
         {editSubject && (
           <div className="space-y-4">
             <div>
@@ -184,7 +207,9 @@ export default function SubjectsPage() {
               </label>
             </div>
             <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button variant="outline" onClick={() => setEditSubject(null)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setEditSubject(null)}>
+                Cancel
+              </Button>
               <Button onClick={handleSaveEdit} disabled={saveLoading}>
                 <Save size={16} className="mr-1" />
                 {saveLoading ? "Saving..." : "Save Changes"}

@@ -92,7 +92,7 @@ export default function StudentPage() {
     const date = new Date(dateString);
     return {
       date: date.toLocaleDateString("ru-RU", { day: "numeric", month: "long" }),
-      time: date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
+      time: date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
     };
   };
 
@@ -148,19 +148,14 @@ export default function StudentPage() {
 
   return (
     <AppShell allowedRoles={["STUDENT"]}>
-      <PageHeader 
-        title={data.fullName} 
-        description="Личный кабинет студента" 
-      />
+      <PageHeader title={data.fullName} description="Личный кабинет студента" />
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setActiveTab("schedule")}
           className={`px-4 py-2 rounded-md ${
-            activeTab === "schedule"
-              ? "bg-blue-500 text-white"
-              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            activeTab === "schedule" ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
           }`}
         >
           Расписание
@@ -168,9 +163,7 @@ export default function StudentPage() {
         <button
           onClick={() => setActiveTab("attendance")}
           className={`px-4 py-2 rounded-md ${
-            activeTab === "attendance"
-              ? "bg-blue-500 text-white"
-              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            activeTab === "attendance" ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
           }`}
         >
           Посещаемость
@@ -178,9 +171,7 @@ export default function StudentPage() {
         <button
           onClick={() => setActiveTab("info")}
           className={`px-4 py-2 rounded-md ${
-            activeTab === "info"
-              ? "bg-blue-500 text-white"
-              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            activeTab === "info" ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
           }`}
         >
           Информация
@@ -254,14 +245,12 @@ export default function StudentPage() {
       {activeTab === "attendance" && (
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">История посещаемости</h2>
-          
+
           {data.attendance.length === 0 ? (
-            <Card className="p-6 text-center text-slate-500">
-              Записей о посещаемости пока нет
-            </Card>
+            <Card className="p-6 text-center text-slate-500">Записей о посещаемости пока нет</Card>
           ) : (
             <div className="space-y-2">
-              {data.attendance.map(record => {
+              {data.attendance.map((record) => {
                 const { date, time } = formatDateTime(record.lesson.startsAt);
                 return (
                   <Card key={record.id} className="p-4">
@@ -272,9 +261,7 @@ export default function StudentPage() {
                           {date} в {time}
                         </div>
                         {record.comment && (
-                          <div className="text-sm text-slate-500 mt-1">
-                            Комментарий: {record.comment}
-                          </div>
+                          <div className="text-sm text-slate-500 mt-1">Комментарий: {record.comment}</div>
                         )}
                       </div>
                       <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(record.status)}`}>
@@ -292,7 +279,7 @@ export default function StudentPage() {
       {activeTab === "info" && (
         <div className="space-y-6">
           <h2 className="text-lg font-semibold">Контактная информация</h2>
-          
+
           <Card className="p-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-slate-100 rounded-full">
@@ -331,7 +318,7 @@ export default function StudentPage() {
 
           <h2 className="text-lg font-semibold">Мои зачисления</h2>
           <div className="space-y-3">
-            {data.enrollments.map(enrollment => (
+            {data.enrollments.map((enrollment) => (
               <Card key={enrollment.id} className="p-4">
                 <div className="flex justify-between items-start">
                   <div>
@@ -343,9 +330,14 @@ export default function StudentPage() {
                   <div className="text-right">
                     <div className="font-medium">{enrollment.price.toLocaleString()} сум</div>
                     <div className="text-sm text-slate-500">
-                      Статус: {enrollment.status === "ACTIVE" ? "Активно" : 
-                               enrollment.status === "PAUSED" ? "На паузе" : 
-                               enrollment.status === "FINISHED" ? "Завершено" : "Отменено"}
+                      Статус:{" "}
+                      {enrollment.status === "ACTIVE"
+                        ? "Активно"
+                        : enrollment.status === "PAUSED"
+                          ? "На паузе"
+                          : enrollment.status === "FINISHED"
+                            ? "Завершено"
+                            : "Отменено"}
                     </div>
                   </div>
                 </div>
@@ -356,11 +348,9 @@ export default function StudentPage() {
           <h2 className="text-lg font-semibold">История оплат</h2>
           <div className="space-y-2">
             {data.payments.length === 0 ? (
-              <Card className="p-4 text-center text-slate-500">
-                Оплат пока нет
-              </Card>
+              <Card className="p-4 text-center text-slate-500">Оплат пока нет</Card>
             ) : (
-              data.payments.map(payment => (
+              data.payments.map((payment) => (
                 <Card key={payment.id} className="p-4">
                   <div className="flex justify-between items-center">
                     <div>
@@ -369,9 +359,7 @@ export default function StudentPage() {
                         {new Date(payment.paidAt).toLocaleDateString("ru-RU")}
                       </div>
                     </div>
-                    <div className="font-medium text-green-600">
-                      {payment.amount.toLocaleString()} сум
-                    </div>
+                    <div className="font-medium text-green-600">{payment.amount.toLocaleString()} сум</div>
                   </div>
                 </Card>
               ))

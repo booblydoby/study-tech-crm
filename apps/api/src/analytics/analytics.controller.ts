@@ -13,16 +13,28 @@ import { AnalyticsService } from "./analytics.service";
 @Roles(RoleName.ADMIN)
 export class AnalyticsController {
   constructor(private readonly analytics: AnalyticsService) {}
-  @Get("dashboard") dashboard() { return this.analytics.dashboard(); }
-  @Get("revenue") revenue() { return this.analytics.revenue(); }
-  @Get("debts") debts() { return this.analytics.debts(); }
-  @Get("attendance") attendance() { return this.analytics.attendance(); }
-  @Get("money-debt") moneyDebt() { return this.analytics.moneyDebt(); }
+  @Get("dashboard") dashboard() {
+    return this.analytics.dashboard();
+  }
+  @Get("revenue") revenue() {
+    return this.analytics.revenue();
+  }
+  @Get("debts") debts() {
+    return this.analytics.debts();
+  }
+  @Get("attendance") attendance() {
+    return this.analytics.attendance();
+  }
+  @Get("money-debt") moneyDebt() {
+    return this.analytics.moneyDebt();
+  }
   @Get("payment-due") paymentDue(@Query("daysAhead") daysAhead?: string) {
     const parsed = daysAhead ? Number.parseInt(daysAhead, 10) : 14;
     return this.analytics.paymentDueStatus(Number.isFinite(parsed) && parsed > 0 ? parsed : 14);
   }
-  @Post("reconcile") reconcile() { return this.analytics.reconcile(); }
+  @Post("reconcile") reconcile() {
+    return this.analytics.reconcile();
+  }
   @Get("profit") profit(@Query("from") from?: string, @Query("to") to?: string) {
     return this.analytics.profitSummary(from, to);
   }

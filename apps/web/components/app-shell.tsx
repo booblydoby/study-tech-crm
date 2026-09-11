@@ -37,7 +37,17 @@ const allLinks = [
 ];
 
 const linksByRole: Record<AppRole, string[]> = {
-  ADMIN: ["/dashboard", "/students", "/enrollments", "/teachers", "/subjects", "/groups", "/schedule", "/payments", "/analytics"],
+  ADMIN: [
+    "/dashboard",
+    "/students",
+    "/enrollments",
+    "/teachers",
+    "/subjects",
+    "/groups",
+    "/schedule",
+    "/payments",
+    "/analytics"
+  ],
   TEACHER: ["/teacher", "/schedule"],
   STUDENT: ["/student", "/schedule", "/payments"]
 };
@@ -48,7 +58,15 @@ const roleLabels: Record<AppRole, string> = {
   STUDENT: "Студент"
 };
 
-function NavLinks({ links, pathname, onNavigate }: { links: typeof allLinks; pathname: string; onNavigate?: () => void }) {
+function NavLinks({
+  links,
+  pathname,
+  onNavigate
+}: {
+  links: typeof allLinks;
+  pathname: string;
+  onNavigate?: () => void;
+}) {
   return (
     <nav className="space-y-1">
       {links.map((link) => {
@@ -161,11 +179,7 @@ function UserFooter({ user }: { user: CurrentUser | null }) {
         <p className="truncate text-xs font-semibold text-white/90">{user?.fullName ?? "—"}</p>
         <p className="text-xs text-white/45">{user?.role ? roleLabels[user.role] : "—"}</p>
       </div>
-      <button
-        type="button"
-        onClick={logout}
-        className="admin-nav-link w-full text-white/55 hover:text-rose-300"
-      >
+      <button type="button" onClick={logout} className="admin-nav-link w-full text-white/55 hover:text-rose-300">
         <LogOut size={18} />
         Выйти
       </button>

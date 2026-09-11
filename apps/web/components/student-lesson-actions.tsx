@@ -12,7 +12,7 @@ import {
   getAppTimezone,
   getDateKeyInAppTz,
   isBeforeTodayInAppTz,
-  lessonStatusLabelRu,
+  lessonStatusLabelRu
 } from "@/lib/payment-cycle";
 import { Tag, lessonStatusTag } from "@/components/ui/tag";
 import type { StudentCalendarLesson } from "@/components/student-lesson-calendar";
@@ -37,7 +37,7 @@ export function LessonRescheduleModal({
   lessonId,
   startsAt,
   endsAt,
-  onSuccess,
+  onSuccess
 }: LessonRescheduleModalProps) {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
@@ -61,7 +61,7 @@ export function LessonRescheduleModal({
       const built = buildDateTimeInAppTz(date, time, durationMinutes(startsAt, endsAt));
       await apiPatch(`/lessons/${lessonId}`, {
         startsAt: built.startsAt,
-        endsAt: built.endsAt,
+        endsAt: built.endsAt
       });
       onSuccess();
       onClose();
@@ -141,7 +141,7 @@ export function StudentLessonActionPanel({
   onReopen,
   onCreateReplacement,
   onClose,
-  actionLoading,
+  actionLoading
 }: StudentLessonActionPanelProps) {
   if (!lesson) return null;
 
@@ -160,11 +160,10 @@ export function StudentLessonActionPanel({
         <div>
           <p className="font-medium text-white">{lesson.subject.name}</p>
           <p className="text-sm text-white/60">
-            {formatDateWithWeekdayRu(lesson.startsAt)} · {formatTimeRu(lesson.startsAt)} —{" "}
-            {formatTimeRu(lesson.endsAt)}
+            {formatDateWithWeekdayRu(lesson.startsAt)} · {formatTimeRu(lesson.startsAt)} — {formatTimeRu(lesson.endsAt)}
           </p>
           <p className="mt-1 text-xs text-white/45">
-            {lesson.type === "GROUP" ? lesson.group?.name ?? "Группа" : "Индивидуально"} · {lesson.teacher.fullName}
+            {lesson.type === "GROUP" ? (lesson.group?.name ?? "Группа") : "Индивидуально"} · {lesson.teacher.fullName}
             {lesson.isReplacementLesson ? " · перенос" : ""}
           </p>
         </div>
@@ -179,12 +178,7 @@ export function StudentLessonActionPanel({
 
       <div className="flex flex-wrap gap-2">
         {canMarkCompleted ? (
-          <Button
-            type="button"
-            className="h-8 px-3 text-xs"
-            onClick={onMarkCompleted}
-            disabled={actionLoading}
-          >
+          <Button type="button" className="h-8 px-3 text-xs" onClick={onMarkCompleted} disabled={actionLoading}>
             Проведено
           </Button>
         ) : null}
@@ -200,17 +194,35 @@ export function StudentLessonActionPanel({
           </Button>
         ) : null}
         {canMove ? (
-          <Button type="button" variant="outline" className="h-8 px-3 text-xs" onClick={onReschedule} disabled={actionLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-8 px-3 text-xs"
+            onClick={onReschedule}
+            disabled={actionLoading}
+          >
             Перенести
           </Button>
         ) : null}
         {canCancel ? (
-          <Button type="button" variant="outline" className="h-8 px-3 text-xs" onClick={onCancel} disabled={actionLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-8 px-3 text-xs"
+            onClick={onCancel}
+            disabled={actionLoading}
+          >
             Отменить
           </Button>
         ) : null}
         {canReopen ? (
-          <Button type="button" variant="outline" className="h-8 px-3 text-xs" onClick={onReopen} disabled={actionLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-8 px-3 text-xs"
+            onClick={onReopen}
+            disabled={actionLoading}
+          >
             Отменить проведение
           </Button>
         ) : null}
@@ -259,7 +271,7 @@ export function StudentReplacementModal({ isOpen, onClose, lessonId, onSuccess }
       const built = buildDateTimeInAppTz(date, time, 90);
       await apiPost(`/lessons/${lessonId}/reschedule`, {
         newStartsAt: built.startsAt,
-        newEndsAt: built.endsAt,
+        newEndsAt: built.endsAt
       });
       onSuccess();
       onClose();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,7 @@ const dayOptions = [
   { value: 3, label: "Ср" },
   { value: 4, label: "Чт" },
   { value: 5, label: "Пт" },
-  { value: 6, label: "Сб" },
+  { value: 6, label: "Сб" }
 ];
 
 export default function GroupDetailPage() {
@@ -78,17 +78,13 @@ export default function GroupDetailPage() {
   const [addStudentId, setAddStudentId] = useState("");
   const [addStudentStartDate, setAddStudentStartDate] = useState(() => todayDateInputInAppTz());
 
-  useEffect(() => {
-    if (groupId) loadData();
-  }, [groupId]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [groupData, studentsData, teachersData] = await Promise.all([
         apiGet<GroupDetail>(`/groups/${groupId}`),
         apiGet<GroupStudent[]>(`/groups/${groupId}/students`),
-        apiGet<Teacher[]>("/teachers"),
+        apiGet<Teacher[]>("/teachers")
       ]);
       setGroup(groupData);
       setStudents(studentsData);
@@ -106,14 +102,20 @@ export default function GroupDetailPage() {
 
       // Initialize student prices
       const prices: Record<string, number> = {};
-      studentsData.forEach(s => { prices[s.studentId] = s.price; });
+      studentsData.forEach((s) => {
+        prices[s.studentId] = s.price;
+      });
       setStudentPrices(prices);
     } catch (error) {
       console.error("Failed to load group:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [groupId]);
+
+  useEffect(() => {
+    if (groupId) loadData();
+  }, [loadData, groupId]);
 
   const handleSaveGroup = async () => {
     const scheduleChanged =
@@ -132,8 +134,8 @@ export default function GroupDetailPage() {
         schedulePattern: {
           daysOfWeek: editScheduleDays,
           time: editScheduleTime,
-          duration: editScheduleDuration,
-        },
+          duration: editScheduleDuration
+        }
       });
       await loadData();
       if (scheduleChanged) {
@@ -152,7 +154,8 @@ export default function GroupDetailPage() {
   };
 
   const handleSyncPrices = async () => {
-    if (!confirm("Применить цену группы ко всем ученикам? Индивидуальные цены будут сброшены, начисления пересчитаны.")) return;
+    if (!confirm("Применить цену группы ко всем ученикам? Индивидуальные цены будут сброшены, начисления пересчитаны."))
+      return;
     setSaving(true);
     try {
       await apiPost(`/groups/${groupId}/sync-prices`, {});
@@ -170,7 +173,7 @@ export default function GroupDetailPage() {
     setSavingPriceFor(studentId);
     try {
       await apiPatch(`/groups/${groupId}/students/${studentId}/price`, {
-        price: studentPrices[studentId],
+        price: studentPrices[studentId]
       });
       loadData();
     } catch (error) {
@@ -239,7 +242,7 @@ export default function GroupDetailPage() {
   const openAddStudent = async () => {
     try {
       const all = await apiGet<Array<{ id: string; fullName: string }>>("/students");
-      setAllStudents(all.filter(s => !students.some(gs => gs.studentId === s.id)));
+      setAllStudents(all.filter((s) => !students.some((gs) => gs.studentId === s.id)));
       setAddStudentStartDate(todayDateInputInAppTz());
       setShowAddStudent(true);
     } catch (error) {
@@ -248,9 +251,7 @@ export default function GroupDetailPage() {
   };
 
   const toggleDay = (day: number) => {
-    setEditScheduleDays(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    );
+    setEditScheduleDays((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]));
   };
 
   if (loading) {
@@ -269,7 +270,7 @@ export default function GroupDetailPage() {
     );
   }
 
-  const totalCustomPrices = students.filter(s => s.isCustomPrice).length;
+  const totalCustomPrices = students.filter((s) => s.isCustomPrice).length;
 
   return (
     <AppShell allowedRoles={["ADMIN"]}>
@@ -280,7 +281,9 @@ export default function GroupDetailPage() {
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-brand-yellow">{group.name}</h1>
-          <p className="text-sm text-white/50">{group.subject.name} · {group.status === "ACTIVE" ? "Активна" : group.status}</p>
+          <p className="text-sm text-white/50">
+            {group.subject.name} · {group.status === "ACTIVE" ? "Активна" : group.status}
+          </p>
         </div>
         <Button variant="outline" onClick={handleDeleteGroup} className="text-rose-300 hover:border-rose-400/40">
           <Trash2 size={16} className="mr-1" /> Удалить группу
@@ -292,32 +295,27 @@ export default function GroupDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Название</label>
-            <Input
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-            />
+            <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Цена (сум)</label>
-            <Input
-              type="number"
-              value={editPrice}
-              onChange={(e) => setEditPrice(parseInt(e.target.value) || 0)}
-            />
+            <Input type="number" value={editPrice} onChange={(e) => setEditPrice(parseInt(e.target.value) || 0)} />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Преподаватель</label>
             <Select value={editTeacherId} onChange={(e) => setEditTeacherId(e.target.value)}>
               <option value="">Выберите преподавателя</option>
-              {teachers.map(t => (
-                <option key={t.id} value={t.id}>{t.fullName}</option>
+              {teachers.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.fullName}
+                </option>
               ))}
             </Select>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Дни</label>
             <div className="flex gap-1.5">
-              {dayOptions.map(day => (
+              {dayOptions.map((day) => (
                 <button
                   key={day.value}
                   type="button"
@@ -331,11 +329,7 @@ export default function GroupDetailPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Время</label>
-            <Input
-              type="time"
-              value={editScheduleTime}
-              onChange={(e) => setEditScheduleTime(e.target.value)}
-            />
+            <Input type="time" value={editScheduleTime} onChange={(e) => setEditScheduleTime(e.target.value)} />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Длительность (мин)</label>
@@ -364,9 +358,7 @@ export default function GroupDetailPage() {
           </h2>
           <div className="flex items-center gap-2">
             {totalCustomPrices > 0 && (
-              <span className="admin-badge-warn px-2 py-1 text-xs">
-                {totalCustomPrices} со своей ценой
-              </span>
+              <span className="admin-badge-warn px-2 py-1 text-xs">{totalCustomPrices} со своей ценой</span>
             )}
             <Button variant="outline" onClick={openAddStudent} className="text-sm">
               <UserPlus size={14} className="mr-1" /> Добавить
@@ -389,7 +381,7 @@ export default function GroupDetailPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/6">
-                {students.map(s => (
+                {students.map((s) => (
                   <tr key={s.id} className="admin-table-row">
                     <td className="px-6 py-3">
                       <div className="flex items-center gap-2 font-medium text-white/90">
@@ -399,7 +391,9 @@ export default function GroupDetailPage() {
                     </td>
                     <td className="px-6 py-3 text-white/55">{s.phone || "—"}</td>
                     <td className="px-6 py-3">
-                      <span className={`admin-tag ${s.status === "ACTIVE" ? "admin-tag-success" : "admin-tag-neutral"}`}>
+                      <span
+                        className={`admin-tag ${s.status === "ACTIVE" ? "admin-tag-success" : "admin-tag-neutral"}`}
+                      >
                         {s.status === "ACTIVE" ? "Активен" : s.status}
                       </span>
                     </td>
@@ -408,15 +402,15 @@ export default function GroupDetailPage() {
                         <Input
                           type="number"
                           value={studentPrices[s.studentId] ?? s.price}
-                          onChange={(e) => setStudentPrices(prev => ({
-                            ...prev,
-                            [s.studentId]: parseInt(e.target.value) || 0,
-                          }))}
+                          onChange={(e) =>
+                            setStudentPrices((prev) => ({
+                              ...prev,
+                              [s.studentId]: parseInt(e.target.value) || 0
+                            }))
+                          }
                           className="w-32 text-sm"
                         />
-                        {s.isCustomPrice && (
-                          <span className="text-xs text-amber-400">(своя)</span>
-                        )}
+                        {s.isCustomPrice && <span className="text-xs text-amber-400">(своя)</span>}
                       </div>
                     </td>
                     <td className="px-6 py-3 text-right">
@@ -463,13 +457,12 @@ export default function GroupDetailPage() {
         <div className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-white/85">Студент *</label>
-            <Select
-              value={addStudentId}
-              onChange={(e) => setAddStudentId(e.target.value)}
-            >
+            <Select value={addStudentId} onChange={(e) => setAddStudentId(e.target.value)}>
               <option value="">Выберите студента</option>
-              {allStudents.map(s => (
-                <option key={s.id} value={s.id}>{s.fullName}</option>
+              {allStudents.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.fullName}
+                </option>
               ))}
             </Select>
           </div>
@@ -486,8 +479,13 @@ export default function GroupDetailPage() {
             </p>
           </div>
           <div className="flex justify-end gap-2 border-t border-white/10 pt-4">
-            <Button variant="outline" onClick={() => setShowAddStudent(false)}>Отмена</Button>
-            <Button onClick={handleAddStudent} disabled={savingPriceFor === "add" || !addStudentId || !addStudentStartDate}>
+            <Button variant="outline" onClick={() => setShowAddStudent(false)}>
+              Отмена
+            </Button>
+            <Button
+              onClick={handleAddStudent}
+              disabled={savingPriceFor === "add" || !addStudentId || !addStudentStartDate}
+            >
               {savingPriceFor === "add" ? "Добавление..." : "Добавить"}
             </Button>
           </div>

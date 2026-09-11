@@ -16,7 +16,7 @@ function req(method, path, body) {
       hostname: url.hostname,
       port: url.port,
       path: url.pathname,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }
     };
     if (token) opts.headers["Authorization"] = `Bearer ${token}`;
 
@@ -47,7 +47,7 @@ async function main() {
     console.log("1. Login as admin...");
     const login = await req("POST", "/auth/login", {
       email: "admin@study.local",
-      password: "ChangeMe123!",
+      password: "ChangeMe123!"
     });
     token = login.accessToken;
     console.log("   ✓ Logged in");
@@ -63,7 +63,7 @@ async function main() {
       fullName: "Jane Teacher",
       email: "jane@test.com",
       phone: "+998901112233",
-      specialization: "English",
+      specialization: "English"
     });
     teachers.push(teacher);
     console.log("   ✓ Created teacher:", teacher.fullName);
@@ -74,7 +74,7 @@ async function main() {
       subjectId: eng.id,
       teacherId: teacher.id,
       monthlyPrice: 500000,
-      schedulePattern: { daysOfWeek: [1, 3, 5], time: "18:00", duration: 90 },
+      schedulePattern: { daysOfWeek: [1, 3, 5], time: "18:00", duration: 90 }
     });
     groups.push(group1);
     console.log("   ✓ Group 1:", group1.name, "- schedule:", JSON.stringify(group1.schedulePattern));
@@ -84,7 +84,7 @@ async function main() {
       subjectId: math.id,
       teacherId: teacher.id,
       monthlyPrice: 400000,
-      schedulePattern: { daysOfWeek: [2, 4], time: "16:00", duration: 60 },
+      schedulePattern: { daysOfWeek: [2, 4], time: "16:00", duration: 60 }
     });
     groups.push(group2);
     console.log("   ✓ Group 2:", group2.name, "- schedule:", JSON.stringify(group2.schedulePattern));
@@ -95,7 +95,7 @@ async function main() {
       phone: "+998901234567",
       groupIds: [group1.id, group2.id],
       teacherCommission: 30,
-      totalLessons: 12,
+      totalLessons: 12
     });
     students.push(student);
     console.log("   ✓ Created student:", student.fullName);

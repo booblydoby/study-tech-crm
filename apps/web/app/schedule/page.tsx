@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
@@ -59,20 +59,13 @@ export default function SchedulePage() {
 
   const canMarkAttendance = user?.role === "ADMIN" || user?.role === "TEACHER";
 
-  useEffect(() => {
-    setUser(getCachedUser());
-    void loadSchedule();
-  }, [weeks]);
-
-  const loadSchedule = async () => {
+  const loadSchedule = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
     try {
       const from = getStartOfDayInAppTz(new Date());
       const to = getEndOfDayInAppTz(addAppDays(new Date(), weeks * 7 - 1));
-      const data = await apiGet<Lesson[]>(
-        `/lessons?from=${from.toISOString()}&to=${to.toISOString()}`
-      );
+      const data = await apiGet<Lesson[]>(`/lessons?from=${from.toISOString()}&to=${to.toISOString()}`);
       setLessons(data);
     } catch (error) {
       console.error(error);
@@ -80,7 +73,12 @@ export default function SchedulePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [weeks]);
+
+  useEffect(() => {
+    setUser(getCachedUser());
+    void loadSchedule();
+  }, [loadSchedule]);
 
   const openLesson = (lessonId: string) => {
     setSelectedLessonId(lessonId);
@@ -156,7 +154,12 @@ export default function SchedulePage() {
   };
 
   const filteredLessonsCount = useMemo(
-    () => lessons.filter(matchesTypeFilter).length,
+    () =>
+      lessons.filter((lesson) => {
+        if (typeFilter === "all") return true;
+        if (typeFilter === "individual") return lesson.type === "INDIVIDUAL";
+        return lesson.type === "GROUP";
+      }).length,
     [lessons, typeFilter]
   );
 
@@ -177,11 +180,20 @@ export default function SchedulePage() {
             <option value={4}>4 недели</option>
             <option value={8}>8 недель</option>
           </select>
-          <Button variant="outline" onClick={() => void loadSchedule()}><RefreshCw size={16} />Обновить</Button>
+          <Button variant="outline" onClick={() => void loadSchedule()}>
+            <RefreshCw size={16} />
+            Обновить
+          </Button>
           {user?.role === "ADMIN" ? (
             <>
-              <Button variant="outline" onClick={() => void clearFuture()} disabled={generating} className="text-red-600">
-                <Trash2 size={16} />Очистить будущие
+              <Button
+                variant="outline"
+                onClick={() => void clearFuture()}
+                disabled={generating}
+                className="text-red-600"
+              >
+                <Trash2 size={16} />
+                Очистить будущие
               </Button>
               <Button onClick={() => void generateSchedule()} disabled={generating}>
                 <CalendarPlus size={18} />
@@ -214,8 +226,8 @@ export default function SchedulePage() {
 
       {user?.role === "ADMIN" ? (
         <div className="admin-callout mb-4">
-          Новый студент в группе появляется в слотах автоматически. Индивидуальные занятия создаются
-          при добавлении ученика и отмечены оранжевой полосой слева.
+          Новый студент в группе появляется в слотах автоматически. Индивидуальные занятия создаются при добавлении
+          ученика и отмечены оранжевой полосой слева.
         </div>
       ) : null}
 
@@ -224,15 +236,15 @@ export default function SchedulePage() {
           <p className="font-medium text-brand-yellow">Группы без генерации:</p>
           <ul className="mt-2 list-inside list-disc text-white/55">
             {lastIssues.map((issue) => (
-              <li key={`${issue.groupName}-${issue.reason}`}>{issue.groupName} — {issue.reason}</li>
+              <li key={`${issue.groupName}-${issue.reason}`}>
+                {issue.groupName} — {issue.reason}
+              </li>
             ))}
           </ul>
         </div>
       ) : null}
 
-      {loadError ? (
-        <div className="admin-badge-danger mb-4 px-4 py-3 text-sm">{loadError}</div>
-      ) : null}
+      {loadError ? <div className="admin-badge-danger mb-4 px-4 py-3 text-sm">{loadError}</div> : null}
 
       {loading ? (
         <div className="py-8 text-center text-slate-500">Загрузка...</div>
@@ -247,77 +259,84 @@ export default function SchedulePage() {
             if (visibleLessons.length === 0) return null;
             const isToday = visibleLessons.some((l) => isTodayInAppTz(l.startsAt));
             return (
-            <section key={dateLabel}>
-              <h2 className={`mb-2 text-sm font-semibold uppercase tracking-wide ${isToday ? "text-brand-yellow" : "text-white/45"}`}>
-                {dateLabel}{isToday ? " · сегодня" : ""}
-              </h2>
-              <div className="space-y-2">
-                {visibleLessons.map((lesson) => {
-                  const isIndividual = lesson.type === "INDIVIDUAL";
-                  const status = lessonStatusTag(lesson.status);
-                  return (
-                  <Card
-                    key={lesson.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => openLesson(lesson.id)}
-                    onKeyDown={(e) => e.key === "Enter" && openLesson(lesson.id)}
-                    className={`admin-lesson-row flex cursor-pointer flex-col gap-3 !p-4 md:flex-row md:items-center md:gap-4 ${
-                      lesson.status === "CANCELLED" ? "opacity-55" : ""
-                    } ${isIndividual ? "admin-lesson-row--individual" : ""} ${isToday ? "admin-lesson-row--today" : ""}`}
-                  >
-                    <div className="w-20 shrink-0 font-semibold text-brand-yellow">{formatTimeRu(lesson.startsAt)}</div>
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-white/90">{lesson.group?.name ?? lesson.student?.fullName ?? lesson.subject.name}</div>
-                      <div className="text-sm text-white/45">{lesson.subject.name} · {lesson.teacher.fullName}</div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Tag variant={status.variant}>{status.label}</Tag>
-                      {isIndividual ? (
-                        <Tag variant="brand">
-                          <Sparkles size={12} /> Индив.
-                        </Tag>
-                      ) : (
-                        <Tag variant="group">Группа</Tag>
-                      )}
-                      {lesson.isReplacementLesson ? (
-                        <Tag variant="warning">Перенос</Tag>
-                      ) : null}
-                    </div>
-                    {canMarkAttendance && lesson.status !== "CANCELLED" ? (
-                      <div className="flex shrink-0 flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openAttendance(lesson.id);
-                          }}
-                          className="inline-flex items-center gap-1 rounded-lg border border-white/12 bg-white/5 px-2 py-1 text-xs font-medium text-white/80 transition-colors hover:border-brand-amber/40 hover:bg-brand-amber/10 hover:text-brand-yellow"
-                        >
-                          <Users size={14} />
-                          Посещаемость
-                        </button>
-                        {lesson.status === "SCHEDULED" ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openCancel(lesson.id);
-                            }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-rose-500/25 bg-rose-500/5 px-2 py-1 text-xs font-medium text-rose-300 transition-colors hover:border-rose-400/40 hover:bg-rose-500/10"
-                          >
-                            <XCircle size={14} />
-                            Отменить
-                          </button>
+              <section key={dateLabel}>
+                <h2
+                  className={`mb-2 text-sm font-semibold uppercase tracking-wide ${isToday ? "text-brand-yellow" : "text-white/45"}`}
+                >
+                  {dateLabel}
+                  {isToday ? " · сегодня" : ""}
+                </h2>
+                <div className="space-y-2">
+                  {visibleLessons.map((lesson) => {
+                    const isIndividual = lesson.type === "INDIVIDUAL";
+                    const status = lessonStatusTag(lesson.status);
+                    return (
+                      <Card
+                        key={lesson.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => openLesson(lesson.id)}
+                        onKeyDown={(e) => e.key === "Enter" && openLesson(lesson.id)}
+                        className={`admin-lesson-row flex cursor-pointer flex-col gap-3 !p-4 md:flex-row md:items-center md:gap-4 ${
+                          lesson.status === "CANCELLED" ? "opacity-55" : ""
+                        } ${isIndividual ? "admin-lesson-row--individual" : ""} ${isToday ? "admin-lesson-row--today" : ""}`}
+                      >
+                        <div className="w-20 shrink-0 font-semibold text-brand-yellow">
+                          {formatTimeRu(lesson.startsAt)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-white/90">
+                            {lesson.group?.name ?? lesson.student?.fullName ?? lesson.subject.name}
+                          </div>
+                          <div className="text-sm text-white/45">
+                            {lesson.subject.name} · {lesson.teacher.fullName}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Tag variant={status.variant}>{status.label}</Tag>
+                          {isIndividual ? (
+                            <Tag variant="brand">
+                              <Sparkles size={12} /> Индив.
+                            </Tag>
+                          ) : (
+                            <Tag variant="group">Группа</Tag>
+                          )}
+                          {lesson.isReplacementLesson ? <Tag variant="warning">Перенос</Tag> : null}
+                        </div>
+                        {canMarkAttendance && lesson.status !== "CANCELLED" ? (
+                          <div className="flex shrink-0 flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openAttendance(lesson.id);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg border border-white/12 bg-white/5 px-2 py-1 text-xs font-medium text-white/80 transition-colors hover:border-brand-amber/40 hover:bg-brand-amber/10 hover:text-brand-yellow"
+                            >
+                              <Users size={14} />
+                              Посещаемость
+                            </button>
+                            {lesson.status === "SCHEDULED" ? (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openCancel(lesson.id);
+                                }}
+                                className="inline-flex items-center gap-1 rounded-lg border border-rose-500/25 bg-rose-500/5 px-2 py-1 text-xs font-medium text-rose-300 transition-colors hover:border-rose-400/40 hover:bg-rose-500/10"
+                              >
+                                <XCircle size={14} />
+                                Отменить
+                              </button>
+                            ) : null}
+                          </div>
                         ) : null}
-                      </div>
-                    ) : null}
-                  </Card>
-                  );
-                })}
-              </div>
-            </section>
-          );
+                      </Card>
+                    );
+                  })}
+                </div>
+              </section>
+            );
           })}
         </div>
       )}

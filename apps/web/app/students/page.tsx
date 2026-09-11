@@ -13,13 +13,20 @@ import { StudentLessonCalendar, type StudentCalendarLesson } from "@/components/
 import {
   LessonRescheduleModal,
   StudentLessonActionPanel,
-  StudentReplacementModal,
+  StudentReplacementModal
 } from "@/components/student-lesson-actions";
 import { cn } from "@/lib/utils";
 import { Plus, Save, Search, Trash2 } from "lucide-react";
 import { RoleButton } from "@/components/role-button";
 import { apiGet, apiDelete, apiPost, apiPatch } from "@/lib/api";
-import { formatSchedule, dateOnlyToIsoStartInAppTz, formatDateRu, isoToDateInputInAppTz, isBeforeTodayInAppTz, todayDateInputInAppTz } from "@/lib/payment-cycle";
+import {
+  formatSchedule,
+  dateOnlyToIsoStartInAppTz,
+  formatDateRu,
+  isoToDateInputInAppTz,
+  isBeforeTodayInAppTz,
+  todayDateInputInAppTz
+} from "@/lib/payment-cycle";
 
 import { Tag, studentStatusTag } from "@/components/ui/tag";
 import { Avatar } from "@/components/ui/avatar";
@@ -77,20 +84,18 @@ const dayOptions = [
   { value: 4, label: "Чт" },
   { value: 5, label: "Пт" },
   { value: 6, label: "Сб" },
-  { value: 0, label: "Вс" },
+  { value: 0, label: "Вс" }
 ];
 
 const slotEditorId = () =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2);
+  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2);
 
 function scheduleToEditorSlots(pattern: unknown): EditorSlot[] {
   const make = (s: { daysOfWeek?: number[]; time?: string; duration?: number }): EditorSlot => ({
     id: slotEditorId(),
     days: s.daysOfWeek ?? [],
     time: s.time ?? "17:30",
-    duration: s.duration ?? 90,
+    duration: s.duration ?? 90
   });
   if (pattern && typeof pattern === "object") {
     const obj = pattern as { slots?: unknown; daysOfWeek?: number[]; time?: string; duration?: number };
@@ -239,9 +244,7 @@ export default function StudentsPage() {
   const toggleEditorDay = (id: string, day: number) => {
     setEditorSlots((prev) =>
       prev.map((s) =>
-        s.id === id
-          ? { ...s, days: s.days.includes(day) ? s.days.filter((d) => d !== day) : [...s.days, day] }
-          : s
+        s.id === id ? { ...s, days: s.days.includes(day) ? s.days.filter((d) => d !== day) : [...s.days, day] } : s
       )
     );
   };
@@ -344,7 +347,7 @@ export default function StudentsPage() {
     if (!selectedStudent || !resetPassword) return;
     try {
       await apiPost(`/students/${selectedStudent.id}/reset-password`, {
-        newPassword: resetPassword,
+        newPassword: resetPassword
       });
       alert("Пароль обновлён");
       setResetPassword("");
@@ -465,9 +468,7 @@ export default function StudentsPage() {
     }
   };
 
-  const filteredStudents = students.filter(s => 
-    s.fullName.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredStudents = students.filter((s) => s.fullName.toLowerCase().includes(search.toLowerCase()));
 
   const formatSubjects = (enrollments: Student["enrollments"]) => {
     if (!enrollments || enrollments.length === 0) return "-";
@@ -480,25 +481,22 @@ export default function StudentsPage() {
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Студенты" description="Регистрация и зачисление в группы или на индивидуальные занятия." />
         <RoleButton allowedRoles={["ADMIN"]}>
-          <Button onClick={() => setIsModalOpen(true)}><Plus size={18} />Новый студент</Button>
+          <Button onClick={() => setIsModalOpen(true)}>
+            <Plus size={18} />
+            Новый студент
+          </Button>
         </RoleButton>
       </div>
 
       <div className="mb-4 flex max-w-md items-center gap-2">
         <Search size={18} className="text-slate-400" />
-        <Input 
-          placeholder="Поиск по имени" 
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <Input placeholder="Поиск по имени" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       {loading ? (
         <div className="text-center py-8 text-slate-500">Загрузка...</div>
       ) : filteredStudents.length === 0 ? (
-        <div className="text-center py-8 text-slate-500">
-          {search ? "Никого не найдено" : "Студентов пока нет"}
-        </div>
+        <div className="text-center py-8 text-slate-500">{search ? "Никого не найдено" : "Студентов пока нет"}</div>
       ) : (
         <div className="admin-card overflow-hidden !p-0">
           <table className="w-full text-sm">
@@ -515,32 +513,32 @@ export default function StudentsPage() {
               {filteredStudents.map((student) => {
                 const st = studentStatusTag(student.status);
                 return (
-                <tr key={student.id} className="admin-table-row border-b border-white/6">
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => handleViewStudent(student.id)}
-                      className="flex items-center gap-2 font-medium text-brand-yellow hover:underline text-left transition-opacity hover:opacity-80"
-                    >
-                      <Avatar avatarId={student.avatarId} name={student.fullName} size="sm" />
-                      {student.fullName}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-white/55">{student.phone || "—"}</td>
-                  <td className="px-4 py-3 text-white/55">{formatSubjects(student.enrollments)}</td>
-                  <td className="px-4 py-3">
-                    <Tag variant={st.variant}>{st.label}</Tag>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => handleDelete(student.id, student.fullName)}
-                      className="rounded p-1.5 text-rose-400 transition-colors hover:bg-rose-500/10"
-                      title="Удалить"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              );
+                  <tr key={student.id} className="admin-table-row border-b border-white/6">
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleViewStudent(student.id)}
+                        className="flex items-center gap-2 font-medium text-brand-yellow hover:underline text-left transition-opacity hover:opacity-80"
+                      >
+                        <Avatar avatarId={student.avatarId} name={student.fullName} size="sm" />
+                        {student.fullName}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-white/55">{student.phone || "—"}</td>
+                    <td className="px-4 py-3 text-white/55">{formatSubjects(student.enrollments)}</td>
+                    <td className="px-4 py-3">
+                      <Tag variant={st.variant}>{st.label}</Tag>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => handleDelete(student.id, student.fullName)}
+                        className="rounded p-1.5 text-rose-400 transition-colors hover:bg-rose-500/10"
+                        title="Удалить"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                );
               })}
             </tbody>
           </table>
@@ -548,13 +546,8 @@ export default function StudentsPage() {
       )}
 
       {/* Create Student Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Новый студент"
-        footer={null}
-      >
-        <CreateStudentForm 
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Новый студент" footer={null}>
+        <CreateStudentForm
           onSuccess={() => {
             setIsModalOpen(false);
             loadStudents();
@@ -591,9 +584,7 @@ export default function StudentsPage() {
                 onClick={() => setStudentTab("profile")}
                 className={cn(
                   "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-                  studentTab === "profile"
-                    ? "bg-brand-amber/15 text-brand-yellow"
-                    : "text-white/55 hover:text-white/80"
+                  studentTab === "profile" ? "bg-brand-amber/15 text-brand-yellow" : "text-white/55 hover:text-white/80"
                 )}
               >
                 Профиль и записи
@@ -622,282 +613,285 @@ export default function StudentsPage() {
               </>
             ) : (
               <>
-            <div className="flex items-start gap-4">
-              <Avatar avatarId={selectedStudent.avatarId} name={selectedStudent.fullName} size="lg" />
-              <div className="min-w-0 flex-1">
-                <AvatarPicker
-                  value={selectedStudent.avatarId ?? 1}
-                  onChange={(id) => void saveAvatar(id)}
-                  disabled={savingAvatar}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="text-white/45">Логин:</div>
-              <div className="font-medium text-white/90">{selectedStudent.user?.email || "—"}</div>
-              <div className="text-white/45">Телефон:</div>
-              <div className="text-white/75">{selectedStudent.phone || "-"}</div>
-              <div className="text-white/45">Telegram:</div>
-              <div className="text-white/75">{selectedStudent.telegram || "-"}</div>
-              <div className="text-white/45">Тел. родителя:</div>
-              <div className="text-white/75">{selectedStudent.parentPhone || "-"}</div>
-              <div className="text-white/45">Источник:</div>
-              <div className="text-white/75">{selectedStudent.source || "-"}</div>
-              <div className="text-white/45">Статус:</div>
-              <div>
-                <Tag variant={studentStatusTag(selectedStudent.status).variant}>
-                  {studentStatusTag(selectedStudent.status).label}
-                </Tag>
-              </div>
-            </div>
-
-            {selectedStudent.user?.email && (
-              <div className="border-t border-white/10 pt-2">
-                <button
-                  onClick={() => setShowReset(!showReset)}
-                  className="mb-2 text-sm text-brand-yellow hover:underline"
-                >
-                  {showReset ? "Отмена" : "Сбросить пароль"}
-                </button>
-                {showReset && (
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="text"
-                      value={resetPassword}
-                      onChange={(e) => setResetPassword(e.target.value)}
-                      placeholder="Новый пароль"
-                      className="flex-1"
+                <div className="flex items-start gap-4">
+                  <Avatar avatarId={selectedStudent.avatarId} name={selectedStudent.fullName} size="lg" />
+                  <div className="min-w-0 flex-1">
+                    <AvatarPicker
+                      value={selectedStudent.avatarId ?? 1}
+                      onChange={(id) => void saveAvatar(id)}
+                      disabled={savingAvatar}
                     />
-                    <Button onClick={handleResetPassword}>Сохранить</Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-white/45">Логин:</div>
+                  <div className="font-medium text-white/90">{selectedStudent.user?.email || "—"}</div>
+                  <div className="text-white/45">Телефон:</div>
+                  <div className="text-white/75">{selectedStudent.phone || "-"}</div>
+                  <div className="text-white/45">Telegram:</div>
+                  <div className="text-white/75">{selectedStudent.telegram || "-"}</div>
+                  <div className="text-white/45">Тел. родителя:</div>
+                  <div className="text-white/75">{selectedStudent.parentPhone || "-"}</div>
+                  <div className="text-white/45">Источник:</div>
+                  <div className="text-white/75">{selectedStudent.source || "-"}</div>
+                  <div className="text-white/45">Статус:</div>
+                  <div>
+                    <Tag variant={studentStatusTag(selectedStudent.status).variant}>
+                      {studentStatusTag(selectedStudent.status).label}
+                    </Tag>
+                  </div>
+                </div>
+
+                {selectedStudent.user?.email && (
+                  <div className="border-t border-white/10 pt-2">
+                    <button
+                      onClick={() => setShowReset(!showReset)}
+                      className="mb-2 text-sm text-brand-yellow hover:underline"
+                    >
+                      {showReset ? "Отмена" : "Сбросить пароль"}
+                    </button>
+                    {showReset && (
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          type="text"
+                          value={resetPassword}
+                          onChange={(e) => setResetPassword(e.target.value)}
+                          placeholder="Новый пароль"
+                          className="flex-1"
+                        />
+                        <Button onClick={handleResetPassword}>Сохранить</Button>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-            )}
-            
-            {(() => {
-              const debt = (selectedStudent.charges ?? []).reduce((sum, c) => {
-                const paid = c.payments.reduce((s, p) => s + p.amount, 0);
-                const balance = c.dueAmount - paid;
-                if (balance <= 0) return sum;
-                const cycleStarted = isBeforeTodayInAppTz(c.periodFrom);
-                if (paid === 0 && !cycleStarted) return sum;
-                return sum + balance;
-              }, 0);
-              if (debt <= 0) return null;
-              return (
-                <div className="admin-badge-danger px-3 py-2 text-sm">
-                  Текущий долг: <span className="font-semibold">{debt.toLocaleString("ru-RU")} сум</span>
-                </div>
-              );
-            })()}
 
-            {selectedStudent.enrollments.length > 0 && (
-              <>
-                <h4 className="border-t border-white/10 pt-2 font-medium text-white/85">Записи</h4>
-                {selectedStudent.enrollments.map((e) => {
-                  const schedule = e.type === "GROUP" ? e.group?.schedulePattern : e.schedulePattern;
-                  const nowMs = Date.now();
-                  const onBreak = Boolean(
-                    e.breakStart &&
-                      new Date(e.breakStart).getTime() <= nowMs &&
-                      (!e.breakEnd || nowMs < new Date(e.breakEnd).getTime())
-                  );
+                {(() => {
+                  const debt = (selectedStudent.charges ?? []).reduce((sum, c) => {
+                    const paid = c.payments.reduce((s, p) => s + p.amount, 0);
+                    const balance = c.dueAmount - paid;
+                    if (balance <= 0) return sum;
+                    const cycleStarted = isBeforeTodayInAppTz(c.periodFrom);
+                    if (paid === 0 && !cycleStarted) return sum;
+                    return sum + balance;
+                  }, 0);
+                  if (debt <= 0) return null;
                   return (
-                    <div key={e.id} className="admin-surface p-3 text-xs">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-medium text-white/90">{e.subject.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span>{e.type === "GROUP" ? "Группа" : "Индивидуально"}</span>
-                          <button
-                            onClick={() => removeEnrollment(e)}
-                            className="text-rose-500 hover:text-rose-700"
-                            title={e.type === "GROUP" ? "Убрать из группы" : "Удалить запись"}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="mt-1 text-white/50">
-                        {e.teacher.fullName} · {e.paymentPeriod === "MONTHLY" ? "месяц" : "за занятия"}
-                      </div>
-                      <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
-                        <div>
-                          <label className="mb-1 block text-white/45">Начало занятий</label>
-                          <Input
-                            type="date"
-                            value={getStartDateDraft(e)}
-                            onChange={(ev) =>
-                              setStartDateDrafts((prev) => ({ ...prev, [e.id]: ev.target.value }))
-                            }
-                            className="h-8 text-xs"
-                          />
-                          {e.startDate ? (
-                            <p className="mt-1 text-[11px] text-white/35">
-                              Сейчас: {formatDateRu(e.startDate)}
-                            </p>
-                          ) : null}
-                        </div>
-                        <Button
-                          variant="outline"
-                          onClick={() => void saveEnrollmentStartDate(e)}
-                          disabled={savingStartDateId === e.id}
-                          className="h-8 px-2"
-                          title="Сохранить дату начала"
-                        >
-                          <Save size={14} />
-                        </Button>
-                      </div>
-                      <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-                        <div>
-                          <label className="mb-1 block text-white/45">
-                            {e.paymentPeriod === "MONTHLY" ? "Цена / месяц" : "Цена / цикл"} (сум)
-                          </label>
-                          <Input
-                            type="number"
-                            min={0}
-                            value={getFinanceDraft(e).price}
-                            onChange={(ev) =>
-                              updateFinanceDraft(e.id, e, { price: parseInt(ev.target.value, 10) || 0 })
-                            }
-                            className="h-8 text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-white/45">Доля учителя (%)</label>
-                          <Input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={getFinanceDraft(e).teacherCommission}
-                            onChange={(ev) =>
-                              updateFinanceDraft(e.id, e, {
-                                teacherCommission: parseInt(ev.target.value, 10) || 0
-                              })
-                            }
-                            className="h-8 text-xs"
-                          />
-                        </div>
-                        <Button
-                          variant="outline"
-                          onClick={() => void saveEnrollmentFinance(e)}
-                          disabled={savingFinanceId === e.id}
-                          className="h-8 px-2"
-                          title="Сохранить тариф"
-                        >
-                          <Save size={14} />
-                        </Button>
-                      </div>
-                      <div className="mt-1 text-white/50">Расписание: {formatSchedule(schedule)}</div>
-
-                      {onBreak && (
-                        <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-2 py-1">
-                          <span className="text-amber-300">
-                            На перерыве{e.breakEnd ? ` до ${new Date(e.breakEnd).toLocaleDateString("ru-RU")}` : " (бессрочно)"}
-                          </span>
-                          <button onClick={() => endBreak(e)} className="font-medium text-emerald-400 hover:underline">
-                            Завершить
-                          </button>
-                        </div>
-                      )}
-
-                      <label className="mt-2 flex cursor-pointer items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={e.billable ?? true}
-                          onChange={() => toggleBillable(e)}
-                          className="size-3.5"
-                        />
-                        <span className="text-white/65">
-                          Учитывать в выручке и оплатах
-                        </span>
-                      </label>
-                      {!(e.billable ?? true) && (
-                        <p className="mt-1 text-amber-400">
-                          Не учитывается — оплата входит в другой пакет/запись.
-                        </p>
-                      )}
-
-                      <div className="mt-2 flex flex-wrap gap-3">
-                        {e.type === "INDIVIDUAL" && editingScheduleId !== e.id && (
-                          <button
-                            onClick={() => openScheduleEditor(e)}
-                            className="text-brand-yellow hover:underline"
-                          >
-                            Изменить расписание
-                          </button>
-                        )}
-                        {!onBreak && (
-                          <button onClick={() => openBreak(e)} className="text-amber-400 hover:underline">
-                            Перерыв
-                          </button>
-                        )}
-                      </div>
-
-                      {e.type === "INDIVIDUAL" && editingScheduleId === e.id && (
-                        <div className="mt-2 space-y-2 rounded-lg border border-white/10 bg-white/[0.03] p-2">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-white/70">Персональное расписание</span>
-                            <button onClick={addEditorSlot} className="text-blue-600 hover:underline">
-                              + Добавить время
-                            </button>
-                          </div>
-                          {editorSlots.map((slot, index) => (
-                            <div key={slot.id} className="space-y-2 rounded-lg border border-white/10 p-2">
-                              <div className="flex items-center justify-between">
-                                <span className="text-white/40">Слот {index + 1}</span>
-                                {editorSlots.length > 1 && (
-                                  <button
-                                    onClick={() => removeEditorSlot(slot.id)}
-                                    className="text-red-500 hover:underline"
-                                  >
-                                    Удалить
-                                  </button>
-                                )}
-                              </div>
-                              <div className="flex flex-wrap gap-1">
-                                {dayOptions.map((day) => (
-                                  <button
-                                    key={day.value}
-                                    onClick={() => toggleEditorDay(slot.id, day.value)}
-                                    className={`admin-day-btn size-7 ${slot.days.includes(day.value) ? "active" : "inactive"}`}
-                                  >
-                                    {day.label}
-                                  </button>
-                                ))}
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <Input
-                                  type="time"
-                                  value={slot.time}
-                                  onChange={(ev) => updateEditorSlot(slot.id, { time: ev.target.value })}
-                                />
-                                <Input
-                                  type="number"
-                                  value={slot.duration}
-                                  onChange={(ev) =>
-                                    updateEditorSlot(slot.id, { duration: parseInt(ev.target.value, 10) || 60 })
-                                  }
-                                  placeholder="мин"
-                                />
-                              </div>
-                            </div>
-                          ))}
-                          <div className="flex justify-end gap-2 pt-1">
-                            <Button variant="outline" onClick={closeScheduleEditor} disabled={savingSchedule} className="h-8 px-3">
-                              Отмена
-                            </Button>
-                            <Button onClick={saveSchedule} disabled={savingSchedule} className="h-8 px-3">
-                              {savingSchedule ? "Сохранение..." : "Сохранить"}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
+                    <div className="admin-badge-danger px-3 py-2 text-sm">
+                      Текущий долг: <span className="font-semibold">{debt.toLocaleString("ru-RU")} сум</span>
                     </div>
                   );
-                })}
-              </>
-            )}
+                })()}
+
+                {selectedStudent.enrollments.length > 0 && (
+                  <>
+                    <h4 className="border-t border-white/10 pt-2 font-medium text-white/85">Записи</h4>
+                    {selectedStudent.enrollments.map((e) => {
+                      const schedule = e.type === "GROUP" ? e.group?.schedulePattern : e.schedulePattern;
+                      const nowMs = Date.now();
+                      const onBreak = Boolean(
+                        e.breakStart &&
+                        new Date(e.breakStart).getTime() <= nowMs &&
+                        (!e.breakEnd || nowMs < new Date(e.breakEnd).getTime())
+                      );
+                      return (
+                        <div key={e.id} className="admin-surface p-3 text-xs">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium text-white/90">{e.subject.name}</span>
+                            <div className="flex items-center gap-2">
+                              <span>{e.type === "GROUP" ? "Группа" : "Индивидуально"}</span>
+                              <button
+                                onClick={() => removeEnrollment(e)}
+                                className="text-rose-500 hover:text-rose-700"
+                                title={e.type === "GROUP" ? "Убрать из группы" : "Удалить запись"}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="mt-1 text-white/50">
+                            {e.teacher.fullName} · {e.paymentPeriod === "MONTHLY" ? "месяц" : "за занятия"}
+                          </div>
+                          <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+                            <div>
+                              <label className="mb-1 block text-white/45">Начало занятий</label>
+                              <Input
+                                type="date"
+                                value={getStartDateDraft(e)}
+                                onChange={(ev) => setStartDateDrafts((prev) => ({ ...prev, [e.id]: ev.target.value }))}
+                                className="h-8 text-xs"
+                              />
+                              {e.startDate ? (
+                                <p className="mt-1 text-[11px] text-white/35">Сейчас: {formatDateRu(e.startDate)}</p>
+                              ) : null}
+                            </div>
+                            <Button
+                              variant="outline"
+                              onClick={() => void saveEnrollmentStartDate(e)}
+                              disabled={savingStartDateId === e.id}
+                              className="h-8 px-2"
+                              title="Сохранить дату начала"
+                            >
+                              <Save size={14} />
+                            </Button>
+                          </div>
+                          <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+                            <div>
+                              <label className="mb-1 block text-white/45">
+                                {e.paymentPeriod === "MONTHLY" ? "Цена / месяц" : "Цена / цикл"} (сум)
+                              </label>
+                              <Input
+                                type="number"
+                                min={0}
+                                value={getFinanceDraft(e).price}
+                                onChange={(ev) =>
+                                  updateFinanceDraft(e.id, e, { price: parseInt(ev.target.value, 10) || 0 })
+                                }
+                                className="h-8 text-xs"
+                              />
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-white/45">Доля учителя (%)</label>
+                              <Input
+                                type="number"
+                                min={0}
+                                max={100}
+                                value={getFinanceDraft(e).teacherCommission}
+                                onChange={(ev) =>
+                                  updateFinanceDraft(e.id, e, {
+                                    teacherCommission: parseInt(ev.target.value, 10) || 0
+                                  })
+                                }
+                                className="h-8 text-xs"
+                              />
+                            </div>
+                            <Button
+                              variant="outline"
+                              onClick={() => void saveEnrollmentFinance(e)}
+                              disabled={savingFinanceId === e.id}
+                              className="h-8 px-2"
+                              title="Сохранить тариф"
+                            >
+                              <Save size={14} />
+                            </Button>
+                          </div>
+                          <div className="mt-1 text-white/50">Расписание: {formatSchedule(schedule)}</div>
+
+                          {onBreak && (
+                            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-2 py-1">
+                              <span className="text-amber-300">
+                                На перерыве
+                                {e.breakEnd
+                                  ? ` до ${new Date(e.breakEnd).toLocaleDateString("ru-RU")}`
+                                  : " (бессрочно)"}
+                              </span>
+                              <button
+                                onClick={() => endBreak(e)}
+                                className="font-medium text-emerald-400 hover:underline"
+                              >
+                                Завершить
+                              </button>
+                            </div>
+                          )}
+
+                          <label className="mt-2 flex cursor-pointer items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={e.billable ?? true}
+                              onChange={() => toggleBillable(e)}
+                              className="size-3.5"
+                            />
+                            <span className="text-white/65">Учитывать в выручке и оплатах</span>
+                          </label>
+                          {!(e.billable ?? true) && (
+                            <p className="mt-1 text-amber-400">Не учитывается — оплата входит в другой пакет/запись.</p>
+                          )}
+
+                          <div className="mt-2 flex flex-wrap gap-3">
+                            {e.type === "INDIVIDUAL" && editingScheduleId !== e.id && (
+                              <button
+                                onClick={() => openScheduleEditor(e)}
+                                className="text-brand-yellow hover:underline"
+                              >
+                                Изменить расписание
+                              </button>
+                            )}
+                            {!onBreak && (
+                              <button onClick={() => openBreak(e)} className="text-amber-400 hover:underline">
+                                Перерыв
+                              </button>
+                            )}
+                          </div>
+
+                          {e.type === "INDIVIDUAL" && editingScheduleId === e.id && (
+                            <div className="mt-2 space-y-2 rounded-lg border border-white/10 bg-white/[0.03] p-2">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-white/70">Персональное расписание</span>
+                                <button onClick={addEditorSlot} className="text-blue-600 hover:underline">
+                                  + Добавить время
+                                </button>
+                              </div>
+                              {editorSlots.map((slot, index) => (
+                                <div key={slot.id} className="space-y-2 rounded-lg border border-white/10 p-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-white/40">Слот {index + 1}</span>
+                                    {editorSlots.length > 1 && (
+                                      <button
+                                        onClick={() => removeEditorSlot(slot.id)}
+                                        className="text-red-500 hover:underline"
+                                      >
+                                        Удалить
+                                      </button>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-wrap gap-1">
+                                    {dayOptions.map((day) => (
+                                      <button
+                                        key={day.value}
+                                        onClick={() => toggleEditorDay(slot.id, day.value)}
+                                        className={`admin-day-btn size-7 ${slot.days.includes(day.value) ? "active" : "inactive"}`}
+                                      >
+                                        {day.label}
+                                      </button>
+                                    ))}
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <Input
+                                      type="time"
+                                      value={slot.time}
+                                      onChange={(ev) => updateEditorSlot(slot.id, { time: ev.target.value })}
+                                    />
+                                    <Input
+                                      type="number"
+                                      value={slot.duration}
+                                      onChange={(ev) =>
+                                        updateEditorSlot(slot.id, { duration: parseInt(ev.target.value, 10) || 60 })
+                                      }
+                                      placeholder="мин"
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                              <div className="flex justify-end gap-2 pt-1">
+                                <Button
+                                  variant="outline"
+                                  onClick={closeScheduleEditor}
+                                  disabled={savingSchedule}
+                                  className="h-8 px-3"
+                                >
+                                  Отмена
+                                </Button>
+                                <Button onClick={saveSchedule} disabled={savingSchedule} className="h-8 px-3">
+                                  {savingSchedule ? "Сохранение..." : "Сохранить"}
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
               </>
             )}
           </div>
@@ -950,29 +944,29 @@ export default function StudentsPage() {
         </>
       ) : null}
 
-      <Modal
-        isOpen={!!breakEnrollment}
-        onClose={closeBreak}
-        title="Перерыв ученика"
-        footer={null}
-      >
+      <Modal isOpen={!!breakEnrollment} onClose={closeBreak} title="Перерыв ученика" footer={null}>
         {breakEnrollment && (
           <div className="space-y-4 text-sm">
             <p className="text-white/65">
-              Запись: <span className="font-medium">{breakEnrollment.subject.name}</span>{" "}
-              ({breakEnrollment.type === "GROUP" ? "группа" : "индивидуально"}). На время перерыва ученик не считается
+              Запись: <span className="font-medium">{breakEnrollment.subject.name}</span> (
+              {breakEnrollment.type === "GROUP" ? "группа" : "индивидуально"}). На время перерыва ученик не считается
               должником, дата оплаты не горит, занятия не ставятся.
             </p>
             <div>
               <label className="mb-1 block font-medium">Дата возвращения</label>
               <Input type="date" value={breakUntil} onChange={(e) => setBreakUntil(e.target.value)} />
               <p className="mt-1 text-xs text-slate-400">
-                Если не знаешь дату — оставь пустым. Тогда перерыв бессрочный, завершишь его вручную кнопкой «Завершить».
+                Если не знаешь дату — оставь пустым. Тогда перерыв бессрочный, завершишь его вручную кнопкой
+                «Завершить».
               </p>
             </div>
             <div>
               <label className="mb-1 block font-medium">Причина (необязательно)</label>
-              <Input value={breakReason} onChange={(e) => setBreakReason(e.target.value)} placeholder="например, отпуск" />
+              <Input
+                value={breakReason}
+                onChange={(e) => setBreakReason(e.target.value)}
+                placeholder="например, отпуск"
+              />
             </div>
             <div className="flex justify-end gap-2 border-t pt-4">
               <Button variant="outline" onClick={closeBreak} disabled={savingBreak}>

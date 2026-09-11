@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Modal } from "@/components/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiGet, apiPost } from "@/lib/api";
-import {
-  buildDateTimeInAppTz,
-  formatDateWithWeekdayRu,
-  formatTimeRu,
-  lessonStatusLabelRu
-} from "@/lib/payment-cycle";
+import { buildDateTimeInAppTz, formatDateWithWeekdayRu, formatTimeRu, lessonStatusLabelRu } from "@/lib/payment-cycle";
 import { Users } from "lucide-react";
 
 type AttendanceStatus = "PRESENT" | "ABSENT" | "LATE" | "EXCUSED";
@@ -76,6 +71,22 @@ export function LessonDetailModal({
   const [rescheduleTime, setRescheduleTime] = useState("");
   const [savingReschedule, setSavingReschedule] = useState(false);
 
+  const loadRoster = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      try {
+        setRoster(await apiGet<LessonRoster>(`/lessons/${id}/roster`));
+      } catch (error) {
+        console.error(error);
+        alert("Не удалось загрузить участников занятия");
+        onClose();
+      } finally {
+        setLoading(false);
+      }
+    },
+    [onClose]
+  );
+
   useEffect(() => {
     if (isOpen && lessonId) void loadRoster(lessonId);
     if (!isOpen) {
@@ -83,20 +94,7 @@ export function LessonDetailModal({
       setRescheduleDate("");
       setRescheduleTime("");
     }
-  }, [isOpen, lessonId]);
-
-  const loadRoster = async (id: string) => {
-    setLoading(true);
-    try {
-      setRoster(await apiGet<LessonRoster>(`/lessons/${id}/roster`));
-    } catch (error) {
-      console.error(error);
-      alert("Не удалось загрузить участников занятия");
-      onClose();
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isOpen, lessonId, loadRoster]);
 
   const submitReschedule = async () => {
     if (!lessonId || !rescheduleDate || !rescheduleTime) {
@@ -123,11 +121,9 @@ export function LessonDetailModal({
     }
   };
 
-  const canMark =
-    roster && (roster.lesson.status === "SCHEDULED" || roster.lesson.status === "COMPLETED");
+  const canMark = roster && (roster.lesson.status === "SCHEDULED" || roster.lesson.status === "COMPLETED");
   const isCancelled = roster?.lesson.status === "CANCELLED";
-  const needsReschedule =
-    isCancelled && (!roster.replacementLessons || roster.replacementLessons.length === 0);
+  const needsReschedule = isCancelled && (!roster.replacementLessons || roster.replacementLessons.length === 0);
 
   return (
     <Modal
@@ -153,9 +149,7 @@ export function LessonDetailModal({
       ) : (
         <div className="space-y-4">
           <div className="admin-surface p-3 text-sm">
-            <p className="font-medium text-base text-white">
-              {roster.lesson.groupName ?? roster.lesson.subjectName}
-            </p>
+            <p className="font-medium text-base text-white">{roster.lesson.groupName ?? roster.lesson.subjectName}</p>
             <p className="text-white/70">
               {formatDateWithWeekdayRu(roster.lesson.startsAt)} · {formatTimeRu(roster.lesson.startsAt)}
             </p>
@@ -219,13 +213,9 @@ export function LessonDetailModal({
           ) : null}
 
           <div>
-            <p className="mb-2 text-sm font-medium text-white/80">
-              Участники ({roster.students.length})
-            </p>
+            <p className="mb-2 text-sm font-medium text-white/80">Участники ({roster.students.length})</p>
             {roster.students.length === 0 ? (
-              <p className="text-sm text-white/45">
-                Нет студентов в группе. Добавьте их в раздел «Группы».
-              </p>
+              <p className="text-sm text-white/45">Нет студентов в группе. Добавьте их в раздел «Группы».</p>
             ) : (
               <ul className="divide-y divide-white/8 overflow-hidden rounded-lg border border-white/10">
                 {roster.students.map((student) => {

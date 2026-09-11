@@ -111,7 +111,15 @@ function StudentView() {
   );
 }
 
-function Metric({ title, value, icon: Icon }: { title: string; value: string; icon: ComponentType<{ size?: number }> }) {
+function Metric({
+  title,
+  value,
+  icon: Icon
+}: {
+  title: string;
+  value: string;
+  icon: ComponentType<{ size?: number }>;
+}) {
   return (
     <Card>
       <div className="flex items-center justify-between">

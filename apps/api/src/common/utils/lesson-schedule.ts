@@ -164,9 +164,7 @@ export function parseScheduleSlots(value: unknown): ScheduleSlot[] {
   if (!value || typeof value !== "object") return [];
   const obj = value as Record<string, unknown>;
   if (Array.isArray(obj.slots)) {
-    return obj.slots
-      .map((slot) => parseSingleSlot(slot))
-      .filter((slot): slot is ScheduleSlot => slot !== null);
+    return obj.slots.map((slot) => parseSingleSlot(slot)).filter((slot): slot is ScheduleSlot => slot !== null);
   }
   const single = parseSingleSlot(obj);
   return single ? [single] : [];
@@ -191,14 +189,7 @@ function getTimeZoneOffsetMs(instant: Date, timeZone: string): number {
   });
   const parts = dtf.formatToParts(instant);
   const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0);
-  const asUtc = Date.UTC(
-    get("year"),
-    get("month") - 1,
-    get("day"),
-    get("hour"),
-    get("minute"),
-    get("second")
-  );
+  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
   return asUtc - instant.getTime();
 }
 

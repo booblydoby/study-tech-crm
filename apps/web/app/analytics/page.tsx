@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
@@ -8,7 +8,13 @@ import { apiDelete, apiGet, apiPost } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/modal";
-import { attendanceStatusLabelRu, dateOnlyToIsoStartInAppTz, formatDateRu, getStartOfMonthInAppTz, todayDateInputInAppTz } from "@/lib/payment-cycle";
+import {
+  attendanceStatusLabelRu,
+  dateOnlyToIsoStartInAppTz,
+  formatDateRu,
+  getStartOfMonthInAppTz,
+  todayDateInputInAppTz
+} from "@/lib/payment-cycle";
 import { Plus, Trash2, TrendingDown, Wallet } from "lucide-react";
 
 interface AnalyticsData {
@@ -76,15 +82,7 @@ interface PaymentDueData {
   upcoming: PaymentDueItem[];
 }
 
-type ExpenseCategory =
-  | "RENT"
-  | "SALARY"
-  | "UTILITIES"
-  | "SUPPLIES"
-  | "MARKETING"
-  | "EQUIPMENT"
-  | "TAX"
-  | "OTHER";
+type ExpenseCategory = "RENT" | "SALARY" | "UTILITIES" | "SUPPLIES" | "MARKETING" | "EQUIPMENT" | "TAX" | "OTHER";
 
 interface Expense {
   id: string;
@@ -135,23 +133,10 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [reconciling, setReconciling] = useState(false);
 
-  useEffect(() => {
-    void loadAnalytics();
-  }, [profitPeriod]);
-
-  const profitQuery = () => {
-    if (profitPeriod === "month") {
-      const from = getStartOfMonthInAppTz().toISOString();
-      return `?from=${encodeURIComponent(from)}`;
-    }
-    return "";
-  };
-
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     try {
-      const pq = profitQuery();
-      const [dashboard, revenue, debts, attendance, duePayments, money, profitData, expensesData] =
-        await Promise.all([
+      const pq = profitPeriod === "month" ? `?from=${encodeURIComponent(getStartOfMonthInAppTz().toISOString())}` : "";
+      const [dashboard, revenue, debts, attendance, duePayments, money, profitData, expensesData] = await Promise.all([
         apiGet<AnalyticsData>("/analytics/dashboard"),
         apiGet<RevenueData>("/analytics/revenue"),
         apiGet<DebtsData>("/analytics/debts"),
@@ -165,7 +150,7 @@ export default function AnalyticsPage() {
         ...dashboard,
         revenue: revenue.total,
         debts: debts.count,
-        attendance: attendance as Record<string, number>,
+        attendance: attendance as Record<string, number>
       });
       setPaymentDue(duePayments);
       setMoneyDebt(money);
@@ -176,7 +161,11 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [profitPeriod]);
+
+  useEffect(() => {
+    void loadAnalytics();
+  }, [loadAnalytics]);
 
   const handleReconcile = async () => {
     if (!confirm("Пересобрать данные? Зависшие записи (после удаления/перевода из групп) будут отменены.")) return;
@@ -258,13 +247,12 @@ export default function AnalyticsPage() {
     return "—";
   };
 
-  const totalAttendance = data?.attendance
-    ? Object.values(data.attendance).reduce((sum, v) => sum + v, 0)
-    : 0;
+  const totalAttendance = data?.attendance ? Object.values(data.attendance).reduce((sum, v) => sum + v, 0) : 0;
 
-  const presentPct = totalAttendance > 0 && data?.attendance?.PRESENT
-    ? Math.round((data.attendance.PRESENT / totalAttendance) * 100)
-    : 0;
+  const presentPct =
+    totalAttendance > 0 && data?.attendance?.PRESENT
+      ? Math.round((data.attendance.PRESENT / totalAttendance) * 100)
+      : 0;
 
   return (
     <AppShell allowedRoles={["ADMIN"]}>
@@ -351,7 +339,9 @@ export default function AnalyticsPage() {
                   <p className="text-xs uppercase tracking-wide text-white/45 flex items-center gap-1">
                     <Wallet size={14} /> Чистая прибыль
                   </p>
-                  <p className={`mt-2 text-xl font-bold ${profit.netProfit >= 0 ? "text-brand-yellow" : "text-rose-300"}`}>
+                  <p
+                    className={`mt-2 text-xl font-bold ${profit.netProfit >= 0 ? "text-brand-yellow" : "text-rose-300"}`}
+                  >
                     {formatSum(profit.netProfit)}
                   </p>
                 </div>
@@ -420,9 +410,7 @@ export default function AnalyticsPage() {
                         </li>
                       );
                     })}
-                    {profit.expensesTotal <= 0 ? (
-                      <li className="text-slate-500 py-2">Нет расходов за период</li>
-                    ) : null}
+                    {profit.expensesTotal <= 0 ? <li className="text-slate-500 py-2">Нет расходов за период</li> : null}
                   </ul>
                 </Card>
               ) : null}
@@ -471,7 +459,9 @@ export default function AnalyticsPage() {
                   {Object.entries(data.attendance).map(([status, count]) => (
                     <div key={status} className="rounded-md bg-slate-50 px-4 py-3 text-sm flex justify-between">
                       <span>{attendanceStatusLabelRu(status)}</span>
-                      <span className="font-medium">{count} ({Math.round((count / totalAttendance) * 100)}%)</span>
+                      <span className="font-medium">
+                        {count} ({Math.round((count / totalAttendance) * 100)}%)
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -507,16 +497,13 @@ export default function AnalyticsPage() {
               <div>
                 <h2 className="text-base font-semibold">Оплаты</h2>
                 <p className="text-sm text-slate-500">
-                  Просроченные и предстоящие даты оплаты по активным записям (ближайшие {paymentDue?.daysAhead ?? 14} дней).
+                  Просроченные и предстоящие даты оплаты по активным записям (ближайшие {paymentDue?.daysAhead ?? 14}{" "}
+                  дней).
                 </p>
               </div>
               <div className="flex gap-3 text-sm">
-                <span className="admin-tag admin-tag-danger">
-                  Просрочено: {paymentDue?.overdueCount ?? 0}
-                </span>
-                <span className="admin-tag admin-tag-warning">
-                  Скоро: {paymentDue?.upcomingCount ?? 0}
-                </span>
+                <span className="admin-tag admin-tag-danger">Просрочено: {paymentDue?.overdueCount ?? 0}</span>
+                <span className="admin-tag admin-tag-warning">Скоро: {paymentDue?.upcomingCount ?? 0}</span>
               </div>
             </div>
 
@@ -539,9 +526,7 @@ export default function AnalyticsPage() {
                           <tr key={item.enrollmentId} className="align-top">
                             <td className="py-2 pr-3">
                               <div className="font-medium">{item.studentName}</div>
-                              {item.groupName && (
-                                <div className="text-xs text-slate-500">{item.groupName}</div>
-                              )}
+                              {item.groupName && <div className="text-xs text-slate-500">{item.groupName}</div>}
                               {item.enrollmentStatus === "PAUSED" && (
                                 <div className="text-xs text-blue-600">заморожен</div>
                               )}
@@ -585,9 +570,7 @@ export default function AnalyticsPage() {
                           <tr key={item.enrollmentId} className="align-top">
                             <td className="py-2 pr-3">
                               <div className="font-medium">{item.studentName}</div>
-                              {item.groupName && (
-                                <div className="text-xs text-slate-500">{item.groupName}</div>
-                              )}
+                              {item.groupName && <div className="text-xs text-slate-500">{item.groupName}</div>}
                               {item.enrollmentStatus === "PAUSED" && (
                                 <div className="text-xs text-blue-600">заморожен</div>
                               )}

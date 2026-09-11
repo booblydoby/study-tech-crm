@@ -17,35 +17,51 @@ export class TeachersController {
 
   @Get()
   @Roles(RoleName.ADMIN)
-  findAll() { return this.teachers.findAll(); }
+  findAll() {
+    return this.teachers.findAll();
+  }
 
   @Post()
   @Roles(RoleName.ADMIN)
-  create(@Body() dto: CreateTeacherDto) { return this.teachers.create(dto); }
+  create(@Body() dto: CreateTeacherDto) {
+    return this.teachers.create(dto);
+  }
 
   @Get("me/schedule")
   @Roles(RoleName.ADMIN, RoleName.TEACHER)
-  mySchedule(@CurrentUser() user: AuthUser) { return this.teachers.mySchedule(user.sub); }
+  mySchedule(@CurrentUser() user: AuthUser) {
+    return this.teachers.mySchedule(user.sub);
+  }
 
   @Get("me/groups")
   @Roles(RoleName.ADMIN, RoleName.TEACHER)
-  myGroups(@CurrentUser() user: AuthUser) { return this.teachers.myGroups(user.sub); }
+  myGroups(@CurrentUser() user: AuthUser) {
+    return this.teachers.myGroups(user.sub);
+  }
 
   @Get(":id")
   @Roles(RoleName.ADMIN)
-  findOne(@Param("id") id: string) { return this.teachers.findOne(id); }
+  findOne(@Param("id") id: string) {
+    return this.teachers.findOne(id);
+  }
 
   @Patch(":id")
   @Roles(RoleName.ADMIN)
-  update(@Param("id") id: string, @Body() dto: UpdateTeacherDto) { return this.teachers.update(id, dto); }
+  update(@Param("id") id: string, @Body() dto: UpdateTeacherDto) {
+    return this.teachers.update(id, dto);
+  }
 
   @Delete(":id")
   @Roles(RoleName.ADMIN)
-  remove(@Param("id") id: string) { return this.teachers.remove(id); }
+  remove(@Param("id") id: string) {
+    return this.teachers.remove(id);
+  }
 
   @Post(":id/reset-password")
   @Roles(RoleName.ADMIN)
-  resetPassword(@Param("id") id: string, @Body() dto: ResetTeacherPasswordDto) { return this.teachers.resetPassword(id, dto.newPassword); }
+  resetPassword(@Param("id") id: string, @Body() dto: ResetTeacherPasswordDto) {
+    return this.teachers.resetPassword(id, dto.newPassword);
+  }
 
   @Post(":id/payouts")
   @Roles(RoleName.ADMIN)
@@ -55,9 +71,13 @@ export class TeachersController {
 
   @Get(":id/schedule")
   @Roles(RoleName.ADMIN)
-  schedule(@Param("id") id: string) { return this.teachers.schedule(id); }
+  schedule(@Param("id") id: string) {
+    return this.teachers.schedule(id);
+  }
 
   @Get(":id/workload")
   @Roles(RoleName.ADMIN)
-  workload(@Param("id") id: string) { return this.teachers.workload(id); }
+  workload(@Param("id") id: string) {
+    return this.teachers.workload(id);
+  }
 }

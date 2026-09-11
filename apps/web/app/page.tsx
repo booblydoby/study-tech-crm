@@ -1,15 +1,5 @@
 import Link from "next/link";
-import {
-  Clock,
-  GraduationCap,
-  Mail,
-  MapPin,
-  MessageCircle,
-  Monitor,
-  Phone,
-  Sparkles,
-  Users
-} from "lucide-react";
+import { Clock, GraduationCap, Mail, MapPin, MessageCircle, Monitor, Phone, Sparkles, Users } from "lucide-react";
 import { AmbientBackground } from "@/components/landing/ambient-background";
 import { LocationMap } from "@/components/landing/location-map";
 import { SubjectsSection } from "@/components/landing/subjects-section";
@@ -53,10 +43,7 @@ export default function LandingPage() {
             ))}
           </nav>
 
-          <Link
-            href="/login"
-            className="landing-btn landing-btn-outline landing-btn-sm hidden sm:inline-flex"
-          >
+          <Link href="/login" className="landing-btn landing-btn-outline landing-btn-sm hidden sm:inline-flex">
             Вход для учеников
           </Link>
         </div>
@@ -73,9 +60,7 @@ export default function LandingPage() {
               </div>
 
               <h1 className="animate-fade-up-delay-1 text-4xl font-extrabold leading-[1.08] tracking-tight md:text-5xl lg:text-[3.4rem]">
-                Развиваем{" "}
-                <span className="landing-gradient-text">знания</span>{" "}
-                с заботой о каждом{" "}
+                Развиваем <span className="landing-gradient-text">знания</span> с заботой о каждом{" "}
                 <span className="landing-gradient-text">ученике</span>
               </h1>
 
@@ -84,17 +69,11 @@ export default function LandingPage() {
               </p>
 
               <div className="animate-fade-up-delay-3 mt-10 flex flex-wrap gap-4">
-                <a
-                  href="#contacts"
-                  className="landing-btn landing-btn-primary landing-btn-lg"
-                >
+                <a href="#contacts" className="landing-btn landing-btn-primary landing-btn-lg">
                   <Phone size={16} />
                   Записаться на занятие
                 </a>
-                <a
-                  href="#subjects"
-                  className="landing-btn landing-btn-outline landing-btn-lg"
-                >
+                <a href="#subjects" className="landing-btn landing-btn-outline landing-btn-lg">
                   Наши направления
                 </a>
               </div>
@@ -116,8 +95,7 @@ export default function LandingPage() {
                 <div className="absolute -right-8 -top-8 size-32 rounded-full bg-brand-orange/10 blur-2xl" />
                 <p className="text-xs font-medium uppercase tracking-widest text-brand-amber">Study Tech</p>
                 <h2 className="mt-3 text-2xl font-bold leading-snug">
-                  Место, где{" "}
-                  <span className="landing-gradient-text">учиться интересно</span>
+                  Место, где <span className="landing-gradient-text">учиться интересно</span>
                 </h2>
                 <ul className="mt-6 space-y-3">
                   {[
@@ -152,9 +130,7 @@ export default function LandingPage() {
             <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
               <div>
                 <p className="text-sm font-medium uppercase tracking-widest text-brand-amber">О нас</p>
-                <h2 className="mt-3 text-3xl font-bold md:text-4xl">
-                  {siteConfig.about.title}
-                </h2>
+                <h2 className="mt-3 text-3xl font-bold md:text-4xl">{siteConfig.about.title}</h2>
                 <div className="mt-6 space-y-4 text-white/55 leading-relaxed">
                   {siteConfig.about.paragraphs.map((p) => (
                     <p key={p.slice(0, 24)}>{p}</p>
@@ -211,7 +187,9 @@ export default function LandingPage() {
                     <MapPin size={18} />
                     <span className="text-sm font-medium">Адрес</span>
                   </div>
-                  <p className="font-medium text-white">{location.city}, {location.address}</p>
+                  <p className="font-medium text-white">
+                    {location.city}, {location.address}
+                  </p>
                   <p className="mt-1 text-sm text-white/45">{location.district}</p>
                   <p className="mt-2 text-sm text-brand-yellow/80">{location.landmark}</p>
                 </div>
@@ -221,11 +199,17 @@ export default function LandingPage() {
                     <Phone size={18} />
                     <span className="text-sm font-medium">Телефоны</span>
                   </div>
-                  <a href={`tel:${contacts.phone.replace(/\s/g, "")}`} className="block font-medium text-white hover:text-brand-yellow transition-colors">
+                  <a
+                    href={`tel:${contacts.phone.replace(/\s/g, "")}`}
+                    className="block font-medium text-white hover:text-brand-yellow transition-colors"
+                  >
                     {contacts.phone}
                   </a>
                   {contacts.phoneAlt && (
-                    <a href={`tel:${contacts.phoneAlt.replace(/\s/g, "")}`} className="mt-1 block text-sm text-white/55 hover:text-brand-yellow transition-colors">
+                    <a
+                      href={`tel:${contacts.phoneAlt.replace(/\s/g, "")}`}
+                      className="mt-1 block text-sm text-white/55 hover:text-brand-yellow transition-colors"
+                    >
                       {contacts.phoneAlt}
                     </a>
                   )}
@@ -252,7 +236,10 @@ export default function LandingPage() {
                   >
                     Instagram @{contacts.instagram}
                   </a>
-                  <a href={`mailto:${contacts.email}`} className="mt-2 flex items-center gap-2 text-sm text-white/45 hover:text-brand-yellow transition-colors">
+                  <a
+                    href={`mailto:${contacts.email}`}
+                    className="mt-2 flex items-center gap-2 text-sm text-white/45 hover:text-brand-yellow transition-colors"
+                  >
                     <Mail size={14} />
                     {contacts.email}
                   </a>

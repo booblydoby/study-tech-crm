@@ -12,7 +12,7 @@ interface AvatarProps {
 const sizes = {
   sm: { box: "size-8", px: 32 },
   md: { box: "size-10", px: 40 },
-  lg: { box: "size-14", px: 56 },
+  lg: { box: "size-14", px: 56 }
 };
 
 export function Avatar({ avatarId, name, size = "md", className }: AvatarProps) {
@@ -30,13 +30,7 @@ export function Avatar({ avatarId, name, size = "md", className }: AvatarProps) 
       )}
       style={{ boxShadow: `0 0 0 1px ${option.ringColor}` }}
     >
-      <Image
-        src={option.image}
-        alt={option.label}
-        width={dim.px}
-        height={dim.px}
-        className="size-full object-cover"
-      />
+      <Image src={option.image} alt={option.label} width={dim.px} height={dim.px} className="size-full object-cover" />
       <span className="sr-only">{initial}</span>
     </div>
   );

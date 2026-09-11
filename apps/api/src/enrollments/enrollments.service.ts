@@ -51,7 +51,13 @@ export class EnrollmentsService {
           }
         ]
       },
-      include: { student: true, subject: true, teacher: true, group: true, payments: { orderBy: { paidAt: "desc" }, take: 1 } },
+      include: {
+        student: true,
+        subject: true,
+        teacher: true,
+        group: true,
+        payments: { orderBy: { paidAt: "desc" }, take: 1 }
+      },
       orderBy: { createdAt: "desc" }
     });
   }
@@ -61,7 +67,14 @@ export class EnrollmentsService {
     const id = typeof userOrId === "string" ? userOrId : maybeId!;
     const enrollment = await this.prisma.enrollment.findFirst({
       where: { id, ...(user ? { AND: [this.visibleEnrollmentWhere(user)] } : {}) },
-      include: { student: true, subject: true, teacher: true, group: true, payments: { orderBy: { paidAt: "desc" } }, lessons: { orderBy: { startsAt: "asc" } } }
+      include: {
+        student: true,
+        subject: true,
+        teacher: true,
+        group: true,
+        payments: { orderBy: { paidAt: "desc" } },
+        lessons: { orderBy: { startsAt: "asc" } }
+      }
     });
     if (!enrollment) throw new NotFoundException("Enrollment not found");
     return enrollment;
@@ -80,7 +93,7 @@ export class EnrollmentsService {
     let teacherId = dto.teacherId;
     let price = dto.price;
     let schedulePattern: unknown = dto.schedulePattern;
-    let totalLessons = dto.totalLessons;
+    const totalLessons = dto.totalLessons;
 
     if (dto.type === EnrollmentType.GROUP && dto.groupId) {
       const group = await this.prisma.group.findUnique({
@@ -135,7 +148,7 @@ export class EnrollmentsService {
   }
 
   async update(id: string, dto: UpdateEnrollmentDto) {
-    const enrollment = await this.findOne(id);
+    await this.findOne(id);
     if (dto.type === EnrollmentType.INDIVIDUAL && dto.groupId) {
       throw new BadRequestException("Individual enrollment must not have groupId");
     }
@@ -478,9 +491,7 @@ export class EnrollmentsService {
         to.setDate(to.getDate() + 28);
         let occurrences: LessonOccurrence[] = [];
         try {
-          occurrences = getLessonOccurrences(enrollment.schedulePattern, now, 200).filter(
-            (occ) => occ.startsAt <= to
-          );
+          occurrences = getLessonOccurrences(enrollment.schedulePattern, now, 200).filter((occ) => occ.startsAt <= to);
         } catch {
           occurrences = [];
         }
@@ -540,9 +551,7 @@ export class EnrollmentsService {
       where: {
         id: targetGroupId,
         status: "ACTIVE",
-        ...(user.role === RoleName.TEACHER
-          ? { teachers: { some: { teacherId: user.teacherId! } } }
-          : {})
+        ...(user.role === RoleName.TEACHER ? { teachers: { some: { teacherId: user.teacherId! } } } : {})
       },
       include: { teachers: true }
     });
@@ -709,10 +718,7 @@ export class EnrollmentsService {
           teacherDebtShare = share(balance, commission);
         }
 
-        nextDue =
-          balance > 0
-            ? charge.periodFrom
-            : charge.nextPaymentDue ?? charge.periodTo;
+        nextDue = balance > 0 ? charge.periodFrom : (charge.nextPaymentDue ?? charge.periodTo);
 
         if (nextDue && nextDue >= monthStart && nextDue <= monthEnd) {
           const base = balance > 0 ? balance : enrollment.price;

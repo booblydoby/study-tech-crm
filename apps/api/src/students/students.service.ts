@@ -28,10 +28,7 @@ export class StudentsService {
   findAll(user?: StudentAccessUser, search?: string) {
     return this.prisma.student.findMany({
       where: {
-        AND: [
-          this.visibleStudentWhere(user),
-          search ? { fullName: { contains: search, mode: "insensitive" } } : {}
-        ]
+        AND: [this.visibleStudentWhere(user), search ? { fullName: { contains: search, mode: "insensitive" } } : {}]
       },
       include: {
         enrollments: {
@@ -81,9 +78,17 @@ export class StudentsService {
     const student = await this.prisma.student.findUnique({
       where: { userId },
       include: {
-        enrollments: { include: { subject: true, teacher: true, group: true, payments: { orderBy: { paidAt: "desc" } } } },
-        attendance: { include: { lesson: { include: { subject: true, teacher: true, group: true } } }, orderBy: { createdAt: "desc" } },
-        payments: { include: { enrollment: { include: { subject: true, teacher: true, group: true } } }, orderBy: { paidAt: "desc" } }
+        enrollments: {
+          include: { subject: true, teacher: true, group: true, payments: { orderBy: { paidAt: "desc" } } }
+        },
+        attendance: {
+          include: { lesson: { include: { subject: true, teacher: true, group: true } } },
+          orderBy: { createdAt: "desc" }
+        },
+        payments: {
+          include: { enrollment: { include: { subject: true, teacher: true, group: true } } },
+          orderBy: { paidAt: "desc" }
+        }
       }
     });
     if (!student) throw new NotFoundException("Student profile not found");
@@ -93,7 +98,7 @@ export class StudentsService {
   async create(dto: CreateStudentDto) {
     return this.prisma.$transaction(async (tx) => {
       let userId: string | undefined;
-      
+
       // If login and password provided, create a user account for the student
       const login = (dto.login || dto.email)?.trim().toLowerCase();
       if (login && dto.password) {
@@ -102,9 +107,9 @@ export class StudentsService {
           throw new BadRequestException(`User with login "${login}" already exists`);
         }
 
-        const hashedPassword = await import("argon2").then(m => m.hash(dto.password!));
+        const hashedPassword = await import("argon2").then((m) => m.hash(dto.password!));
         const studentRole = await tx.role.findUnique({ where: { name: "STUDENT" } });
-        
+
         const user = await tx.user.create({
           data: {
             email: login,
@@ -201,9 +206,7 @@ export class StudentsService {
         const to = new Date();
         to.setDate(to.getDate() + 28);
         try {
-          const occurrences = getLessonOccurrences(schedulePattern, from, 200).filter(
-            (occ) => occ.startsAt <= to
-          );
+          const occurrences = getLessonOccurrences(schedulePattern, from, 200).filter((occ) => occ.startsAt <= to);
           for (const { startsAt, duration } of occurrences) {
             await tx.lesson.create({
               data: {
@@ -235,7 +238,7 @@ export class StudentsService {
   }
 
   async remove(id: string) {
-    const student = await this.findOne(id);
+    await this.findOne(id);
     // Delete related records first
     await this.prisma.studentNote.deleteMany({ where: { studentId: id } });
     await this.prisma.attendance.deleteMany({ where: { studentId: id } });
@@ -262,7 +265,7 @@ export class StudentsService {
     });
     if (!student?.userId) throw new BadRequestException("Student has no user account");
 
-    const hashedPassword = await import("argon2").then(m => m.hash(dto.newPassword));
+    const hashedPassword = await import("argon2").then((m) => m.hash(dto.newPassword));
     return this.prisma.user.update({
       where: { id: student.userId },
       data: { passwordHash: hashedPassword }
@@ -280,8 +283,14 @@ export class StudentsService {
       include: {
         enrollments: { include: { subject: true, teacher: true, group: true } },
         groups: { include: { group: true } },
-        attendance: { include: { lesson: { include: { group: true, subject: true, enrollment: true } } }, orderBy: { createdAt: "desc" } },
-        payments: { include: { enrollment: { include: { subject: true, teacher: true, group: true } } }, orderBy: { paidAt: "desc" } }
+        attendance: {
+          include: { lesson: { include: { group: true, subject: true, enrollment: true } } },
+          orderBy: { createdAt: "desc" }
+        },
+        payments: {
+          include: { enrollment: { include: { subject: true, teacher: true, group: true } } },
+          orderBy: { paidAt: "desc" }
+        }
       }
     });
   }

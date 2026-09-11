@@ -20,7 +20,7 @@ async function main() {
 
   for (const teacher of teachers) {
     const email = teacher.email.toLowerCase().trim();
-    
+
     // Check if user already exists with this email
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -64,7 +64,7 @@ async function main() {
     // Generate email from name
     const namePart = teacher.fullName.toLowerCase().replace(/[^a-z0-9]/g, ".");
     const email = `${namePart}@study.local`;
-    
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) continue;
 

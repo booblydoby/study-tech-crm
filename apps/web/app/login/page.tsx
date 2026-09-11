@@ -40,7 +40,10 @@ export default function LoginPage() {
       {/* Left branding panel — desktop only */}
       <aside className="relative z-10 hidden w-[45%] flex-col justify-between border-r border-white/5 p-10 lg:flex">
         <div className="animate-fade-up">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/50 transition-colors hover:text-white/80">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm text-white/50 transition-colors hover:text-white/80"
+          >
             <ArrowLeft size={16} />
             На главную
           </Link>
@@ -51,8 +54,7 @@ export default function LoginPage() {
             <GraduationCap size={36} className="text-[#0a0a0a]" />
           </div>
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight">
-            Личный кабинет{" "}
-            <span className="landing-gradient-text">Study Tech</span>
+            Личный кабинет <span className="landing-gradient-text">Study Tech</span>
           </h1>
           <p className="mt-5 max-w-sm text-base leading-relaxed text-white/55">
             Здесь вы можете следить за расписанием, посещаемостью и своим прогрессом в учебном центре.
@@ -72,9 +74,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="animate-fade-up-delay-2 text-xs text-white/25">
-          © {new Date().getFullYear()} Study Tech
-        </p>
+        <p className="animate-fade-up-delay-2 text-xs text-white/25">© {new Date().getFullYear()} Study Tech</p>
       </aside>
 
       {/* Right — login form */}
@@ -90,8 +90,7 @@ export default function LoginPage() {
               <GraduationCap size={28} className="text-[#0a0a0a]" />
             </div>
             <h1 className="text-2xl font-bold">
-              Личный кабинет{" "}
-              <span className="landing-gradient-text">Study Tech</span>
+              Личный кабинет <span className="landing-gradient-text">Study Tech</span>
             </h1>
             <p className="mt-2 text-sm text-white/45">Расписание, посещаемость и оплаты</p>
           </div>
@@ -99,9 +98,7 @@ export default function LoginPage() {
           <div className="landing-glass-strong rounded-3xl p-8 shadow-2xl shadow-black/40">
             <div className="hidden lg:block">
               <h2 className="text-2xl font-bold">Вход</h2>
-              <p className="mt-1 text-sm text-white/45">
-                Используйте логин и пароль, которые вы получили при записи
-              </p>
+              <p className="mt-1 text-sm text-white/45">Используйте логин и пароль, которые вы получили при записи</p>
             </div>
 
             <form className="mt-6 space-y-5 lg:mt-8" onSubmit={onSubmit}>
@@ -162,7 +159,10 @@ export default function LoginPage() {
 
             <p className="mt-5 text-center text-xs text-white/35">
               Нет доступа?{" "}
-              <Link href="/#contacts" className="text-brand-yellow/80 underline-offset-2 hover:text-brand-yellow hover:underline">
+              <Link
+                href="/#contacts"
+                className="text-brand-yellow/80 underline-offset-2 hover:text-brand-yellow hover:underline"
+              >
                 Свяжитесь с центром
               </Link>
             </p>

@@ -41,15 +41,13 @@ const dayOptions = [
   { value: 4, label: "Чт" },
   { value: 5, label: "Пт" },
   { value: 6, label: "Сб" },
-  { value: 0, label: "Вс" },
+  { value: 0, label: "Вс" }
 ];
 
 const cycleOptions = [8, 12, 16, 24];
 
 const newSlotId = () =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2);
+  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2);
 
 interface CreateStudentFormProps {
   onSuccess: () => void;
@@ -77,7 +75,7 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
   const [teacherId, setTeacherId] = useState("");
   const [individualPrice, setIndividualPrice] = useState<number | null>(null);
   const [slots, setSlots] = useState<ScheduleSlot[]>([
-    { id: newSlotId(), days: [1, 3, 5], time: "13:30", duration: 90 },
+    { id: newSlotId(), days: [1, 3, 5], time: "13:30", duration: 90 }
   ]);
 
   const [teacherCommission, setTeacherCommission] = useState(30);
@@ -92,7 +90,7 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
       const [teachersData, subjectsData, groupsData] = await Promise.all([
         apiGet<Teacher[]>("/teachers"),
         apiGet<Subject[]>("/subjects"),
-        apiGet<Group[]>("/groups?activeOnly=true"),
+        apiGet<Group[]>("/groups?activeOnly=true")
       ]);
       setTeachers(teachersData);
       setSubjects(subjectsData);
@@ -103,9 +101,7 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
   };
 
   const toggleGroup = (groupId: string) => {
-    setSelectedGroupIds((prev) =>
-      prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]
-    );
+    setSelectedGroupIds((prev) => (prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]));
   };
 
   const addSlot = () => {
@@ -122,9 +118,7 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
         slot.id === id
           ? {
               ...slot,
-              days: slot.days.includes(day)
-                ? slot.days.filter((d) => d !== day)
-                : [...slot.days, day],
+              days: slot.days.includes(day) ? slot.days.filter((d) => d !== day) : [...slot.days, day]
             }
           : slot
       )
@@ -171,7 +165,7 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
         parentPhone,
         teacherCommission,
         totalLessons,
-        avatarId,
+        avatarId
       };
       if (login) studentData.login = login;
       if (password) studentData.password = password;
@@ -231,7 +225,12 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">Пароль для входа</label>
-            <Input type="text" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Student123!" />
+            <Input
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Student123!"
+            />
           </div>
         </div>
       </div>
@@ -260,7 +259,8 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{group.name}</p>
                   <p className="truncate text-xs text-slate-500">
-                    {group.subject?.name} · {group.teachers[0]?.teacher?.fullName ?? "—"} · {group.monthlyPrice.toLocaleString()} сум
+                    {group.subject?.name} · {group.teachers[0]?.teacher?.fullName ?? "—"} ·{" "}
+                    {group.monthlyPrice.toLocaleString()} сум
                   </p>
                 </div>
               </label>
@@ -295,7 +295,9 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
                 <Select value={subjectId} onChange={(e) => setSubjectId(e.target.value)}>
                   <option value="">Выберите предмет</option>
                   {subjects.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
                   ))}
                 </Select>
               </div>
@@ -304,7 +306,9 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
                 <Select value={teacherId} onChange={(e) => setTeacherId(e.target.value)}>
                   <option value="">Выберите преподавателя</option>
                   {teachers.map((t) => (
-                    <option key={t.id} value={t.id}>{t.fullName}</option>
+                    <option key={t.id} value={t.id}>
+                      {t.fullName}
+                    </option>
                   ))}
                 </Select>
               </div>
@@ -405,7 +409,9 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
                 type="button"
                 onClick={() => setTotalLessons(cycle)}
                 className={`rounded-lg px-3 py-1 text-sm ${
-                  totalLessons === cycle ? "bg-brand-amber text-black font-semibold" : "border border-white/12 bg-white/5 text-white/70"
+                  totalLessons === cycle
+                    ? "bg-brand-amber text-black font-semibold"
+                    : "border border-white/12 bg-white/5 text-white/70"
                 }`}
               >
                 {cycle}
@@ -416,8 +422,12 @@ export function CreateStudentForm({ onSuccess, onClose }: CreateStudentFormProps
       </div>
 
       <div className="flex justify-end gap-2 border-t pt-4">
-        <Button type="button" variant="outline" onClick={onClose} disabled={loading}>Отмена</Button>
-        <Button type="submit" disabled={loading}>{loading ? "Создание..." : "Создать"}</Button>
+        <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+          Отмена
+        </Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Создание..." : "Создать"}
+        </Button>
       </div>
     </form>
   );

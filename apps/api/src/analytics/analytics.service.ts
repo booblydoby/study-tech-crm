@@ -192,10 +192,7 @@ export class AnalyticsService {
   async paymentDueStatus(daysAhead = 14) {
     const timeZone = getAppTimezone();
     const todayKey = this.toDateKey(new Date(), timeZone);
-    const upcomingUntilKey = this.toDateKey(
-      new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000),
-      timeZone
-    );
+    const upcomingUntilKey = this.toDateKey(new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000), timeZone);
 
     const enrollments = await this.prisma.enrollment.findMany({
       where: { status: { in: [EnrollmentStatus.ACTIVE, EnrollmentStatus.PAUSED] }, billable: true },
@@ -227,7 +224,7 @@ export class AnalyticsService {
 
       // Если текущий цикл недоплачен — платёж ожидается с начала цикла.
       // Если оплачен полностью — следующий платёж в конце цикла.
-      const dueDate = balance > 0 ? charge.periodFrom : charge.nextPaymentDue ?? charge.periodTo;
+      const dueDate = balance > 0 ? charge.periodFrom : (charge.nextPaymentDue ?? charge.periodTo);
       const dueKey = this.toDateKey(dueDate, timeZone);
       const diff = this.diffCalendarDays(todayKey, dueKey);
       const daysUntilDue = diff >= 0 ? diff : null;

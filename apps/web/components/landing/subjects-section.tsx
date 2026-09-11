@@ -4,13 +4,7 @@ import { ArrowRight, CheckCircle2, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { siteConfig, type SiteSubject } from "@/lib/site-config";
 
-function SubjectModal({
-  subject,
-  onClose
-}: {
-  subject: SiteSubject;
-  onClose: () => void;
-}) {
+function SubjectModal({ subject, onClose }: { subject: SiteSubject; onClose: () => void }) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
@@ -68,9 +62,7 @@ function SubjectModal({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           <div className="mb-6">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-amber">
-              Программы обучения
-            </h3>
+            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-amber">Программы обучения</h3>
             <div className="space-y-3">
               {subject.programs.map((program) => (
                 <div
@@ -150,9 +142,7 @@ export function SubjectsSection() {
             </div>
 
             <h3 className="text-xl font-bold text-white">{subject.name}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-white/50 line-clamp-3">
-              {subject.shortDescription}
-            </p>
+            <p className="mt-2 text-sm leading-relaxed text-white/50 line-clamp-3">{subject.shortDescription}</p>
 
             <div className="mt-4 flex flex-wrap gap-1.5">
               {subject.highlights.map((h) => (

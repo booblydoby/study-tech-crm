@@ -3,7 +3,13 @@ import { GroupStatus, Prisma } from "@prisma/client";
 import { toInputJson } from "../common/utils/prisma-json";
 import { syncOpenChargesForEnrollment } from "../common/utils/charge-sync";
 import { PrismaService } from "../prisma/prisma.service";
-import { AddStudentToGroupDto, AddTeacherToGroupDto, CreateGroupDto, UpdateGroupDto, UpdateStudentPriceDto } from "./groups.dto";
+import {
+  AddStudentToGroupDto,
+  AddTeacherToGroupDto,
+  CreateGroupDto,
+  UpdateGroupDto,
+  UpdateStudentPriceDto
+} from "./groups.dto";
 
 @Injectable()
 export class GroupsService {
@@ -270,7 +276,7 @@ export class GroupsService {
   }
 
   async updateStudentPrice(groupId: string, studentId: string, dto: UpdateStudentPriceDto) {
-    const group = await this.findOne(groupId);
+    await this.findOne(groupId);
     const studentGroup = await this.prisma.studentGroup.findUnique({
       where: { studentId_groupId: { studentId, groupId } }
     });

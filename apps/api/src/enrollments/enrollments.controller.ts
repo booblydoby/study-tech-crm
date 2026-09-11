@@ -5,7 +5,16 @@ import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { AuthUser, CurrentUser } from "../common/decorators/current-user.decorator";
 import { Roles } from "../common/decorators/roles.decorator";
 import { RolesGuard } from "../common/guards/roles.guard";
-import { AddLessonDebtDto, CreateEnrollmentDto, FreezeEnrollmentDto, StartBreakDto, TransferGroupDto, UnfreezeEnrollmentDto, UpdateEnrollmentDto, UpdateScheduleDto } from "./enrollments.dto";
+import {
+  AddLessonDebtDto,
+  CreateEnrollmentDto,
+  FreezeEnrollmentDto,
+  StartBreakDto,
+  TransferGroupDto,
+  UnfreezeEnrollmentDto,
+  UpdateEnrollmentDto,
+  UpdateScheduleDto
+} from "./enrollments.dto";
 import { EnrollmentsService } from "./enrollments.service";
 
 @ApiTags("enrollments")
@@ -17,7 +26,11 @@ export class EnrollmentsController {
 
   @Get()
   @Roles(RoleName.ADMIN, RoleName.TEACHER, RoleName.STUDENT)
-  findAll(@CurrentUser() user: AuthUser, @Query("studentId") studentId?: string, @Query("teacherId") teacherId?: string) {
+  findAll(
+    @CurrentUser() user: AuthUser,
+    @Query("studentId") studentId?: string,
+    @Query("teacherId") teacherId?: string
+  ) {
     return this.enrollments.findAll(user, studentId, teacherId);
   }
 
@@ -29,7 +42,12 @@ export class EnrollmentsController {
 
   @Get("teacher/:teacherId/earnings")
   @Roles(RoleName.ADMIN, RoleName.TEACHER)
-  getTeacherEarnings(@CurrentUser() user: AuthUser, @Param("teacherId") teacherId: string, @Query("from") from?: string, @Query("to") to?: string) {
+  getTeacherEarnings(
+    @CurrentUser() user: AuthUser,
+    @Param("teacherId") teacherId: string,
+    @Query("from") from?: string,
+    @Query("to") to?: string
+  ) {
     return this.enrollments.getTeacherEarnings(user, teacherId, from, to);
   }
 

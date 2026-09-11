@@ -37,7 +37,7 @@ export default function TeachersPage() {
     specialization: "",
     login: "",
     password: "",
-    avatarId: 1 as AvatarId,
+    avatarId: 1 as AvatarId
   });
 
   // Edit modal
@@ -63,7 +63,9 @@ export default function TeachersPage() {
   } | null>(null);
   const [financeLoadFailed, setFinanceLoadFailed] = useState(false);
 
-  useEffect(() => { loadTeachers(); }, []);
+  useEffect(() => {
+    loadTeachers();
+  }, []);
 
   const loadTeachers = async () => {
     setLoading(true);
@@ -177,7 +179,7 @@ export default function TeachersPage() {
         phone: editPhone || undefined,
         email: editEmail || undefined,
         specialization: editSpecialization || undefined,
-        avatarId: editAvatarId,
+        avatarId: editAvatarId
       });
       setEditTeacher(null);
       loadTeachers();
@@ -194,7 +196,7 @@ export default function TeachersPage() {
     setSaveLoading(true);
     try {
       await apiPost(`/teachers/${editTeacher.id}/reset-password`, {
-        newPassword: resetPassword,
+        newPassword: resetPassword
       });
       alert("Password reset successfully!");
       setResetPassword("");
@@ -211,7 +213,10 @@ export default function TeachersPage() {
     <AppShell allowedRoles={["ADMIN"]}>
       <div className="flex items-start justify-between gap-4">
         <PageHeader title="Преподаватели" description="Профили и доступ в систему." />
-        <Button onClick={() => setIsModalOpen(true)}><Plus size={18} />New teacher</Button>
+        <Button onClick={() => setIsModalOpen(true)}>
+          <Plus size={18} />
+          New teacher
+        </Button>
       </div>
 
       {loading ? (
@@ -250,8 +255,11 @@ export default function TeachersPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleDelete(t.id, t.fullName)}
-                      className="rounded p-1.5 text-rose-400 hover:bg-rose-500/10" title="Delete">
+                    <button
+                      onClick={() => handleDelete(t.id, t.fullName)}
+                      className="rounded p-1.5 text-rose-400 hover:bg-rose-500/10"
+                      title="Delete"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </td>
@@ -265,25 +273,40 @@ export default function TeachersPage() {
       {/* Create Teacher Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Teacher" footer={null}>
         <form onSubmit={handleCreate} className="space-y-4">
-          <AvatarPicker
-            value={formData.avatarId}
-            onChange={(id) => setFormData({ ...formData, avatarId: id })}
-          />
+          <AvatarPicker value={formData.avatarId} onChange={(id) => setFormData({ ...formData, avatarId: id })} />
           <div>
             <label className="mb-1 block text-sm font-medium">ФИО *</label>
-            <Input value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} placeholder="Jane Teacher" required />
+            <Input
+              value={formData.fullName}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              placeholder="Jane Teacher"
+              required
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
-            <Input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+998901234567" />
+            <Input
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              placeholder="+998901234567"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-            <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="teacher@study.local" />
+            <Input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="teacher@study.local"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Specialization</label>
-            <Input value={formData.specialization} onChange={(e) => setFormData({ ...formData, specialization: e.target.value })} placeholder="English, Math, etc." />
+            <Input
+              value={formData.specialization}
+              onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+              placeholder="English, Math, etc."
+            />
           </div>
           <div className="border-t pt-4">
             <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-1">
@@ -292,23 +315,39 @@ export default function TeachersPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Login (email)</label>
-                <Input value={formData.login} onChange={(e) => setFormData({ ...formData, login: e.target.value })} placeholder="jane@study.local" />
+                <Input
+                  value={formData.login}
+                  onChange={(e) => setFormData({ ...formData, login: e.target.value })}
+                  placeholder="jane@study.local"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                <Input type="text" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Teacher123!" />
+                <Input
+                  type="text"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="Teacher123!"
+                />
               </div>
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
             <Button type="submit">Create</Button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Teacher Modal */}
-      <Modal isOpen={!!editTeacher} onClose={() => setEditTeacher(null)} title={`Edit: ${editTeacher?.fullName || ""}`} footer={null}>
+      <Modal
+        isOpen={!!editTeacher}
+        onClose={() => setEditTeacher(null)}
+        title={`Edit: ${editTeacher?.fullName || ""}`}
+        footer={null}
+      >
         {editTeacher && (
           <div className="space-y-4">
             <div className="flex items-start gap-4">
@@ -336,7 +375,12 @@ export default function TeachersPage() {
 
             {/* Login info */}
             <div className="admin-info-box">
-              <p>Текущий логин: <span className="font-medium text-white">{editTeacher.email || editTeacher.user?.email || "Нет аккаунта"}</span></p>
+              <p>
+                Текущий логин:{" "}
+                <span className="font-medium text-white">
+                  {editTeacher.email || editTeacher.user?.email || "Нет аккаунта"}
+                </span>
+              </p>
             </div>
 
             <div className="border-t border-white/10 pt-4">
@@ -368,11 +412,7 @@ export default function TeachersPage() {
                   onChange={(e) => setPayoutAmount(e.target.value)}
                   placeholder="Сумма"
                 />
-                <Input
-                  type="date"
-                  value={payoutDate}
-                  onChange={(e) => setPayoutDate(e.target.value)}
-                />
+                <Input type="date" value={payoutDate} onChange={(e) => setPayoutDate(e.target.value)} />
               </div>
               <Input
                 className="mt-2"
@@ -421,7 +461,9 @@ export default function TeachersPage() {
             </div>
 
             <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button variant="outline" onClick={() => setEditTeacher(null)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setEditTeacher(null)}>
+                Cancel
+              </Button>
               <Button onClick={handleSaveEdit} disabled={saveLoading}>
                 <Save size={16} className="mr-1" />
                 {saveLoading ? "Saving..." : "Save Changes"}
