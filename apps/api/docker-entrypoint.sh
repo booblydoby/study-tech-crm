@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-cd /app/apps/api
+cd /app
 
 echo "Applying database migrations..."
-npx prisma migrate deploy
+pnpm --filter @study-crm/api prisma:migrate:deploy
 
 echo "Starting API server..."
-exec node dist/src/main.js
+exec pnpm --filter @study-crm/api start
